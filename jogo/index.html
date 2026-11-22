@@ -1,0 +1,1007 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://firestore.googleapis.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23d6293f'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3E%3F%3C/text%3E%3C/svg%3E">
+<title>Golpe ou Confiável?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: uma coluna estreita como um feed de celular; cabeçalho com placar, o post no centro, botões de voto fixos no rodapé. */
+:root{
+  --bg:#060606; --surface:rgba(255,255,255,.06); --ink:#F5F5F4; --muted:#A6A6A3; --line:rgba(255,255,255,.14);
+  --accent:#F16001; --on-accent:#ffffff; --scam:#FF5A36; --scam-soft:rgba(255,90,54,.14); --safe:#3BE36B; --safe-soft:rgba(59,227,107,.12); --flag:#F16001;
+  --g:linear-gradient(160deg,#000000 0%,#C10801 42%,#F16001 78%,#D9C3AB 100%);
+  --post-bg:#ffffff; --post-ink:#14161f; --post-muted:#6b6f80; --post-line:#e6e8ef;
+  --display:"Space Grotesk", system-ui, sans-serif;
+  --body:"Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:dark;
+}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+/* brilho com o gradiente da marca + grade pontilhada, como nos slides */
+body::before{content:"";position:fixed;left:-25%;right:-25%;top:-28vh;height:58vh;border-radius:50%;background:linear-gradient(100deg,#D9C3AB 0%,#F16001 24%,#C10801 62%,#000 100%);filter:blur(90px);opacity:.42;z-index:-1;pointer-events:none}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.16) 1.2px,transparent 1.6px);background-size:48px 48px;-webkit-mask:linear-gradient(#000,transparent 70%);mask:linear-gradient(#000,transparent 70%)}
+/* vidro */
+.intro,.reveal,.end,.tv-live,.score{background:linear-gradient(140deg,rgba(255,255,255,.12),rgba(255,255,255,.035) 60%,rgba(255,255,255,.07))!important;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(255,255,255,.18)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 30px 70px -30px rgba(0,0,0,.7)}
+.wrap{box-sizing:border-box;max-width:460px;margin:0 auto;padding-block:16px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;letter-spacing:-.045em!important;font-size:1.55rem;line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 span{background:linear-gradient(90deg,#C10801,#F16001 70%,#FF8A3D);-webkit-background-clip:text;background-clip:text;color:transparent}
+.score{font-family:var(--display);font-weight:800;font-size:1.05rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.progress{display:flex;gap:5px}
+.progress i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.progress i.ok{background:var(--safe)} .progress i.bad{background:var(--scam)} .progress i.now{background:#fff}
+.prompt{margin:0;color:var(--muted);font-size:.95rem}
+
+/* ---- tela inicial ---- */
+.intro{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{margin:0;font-size:.85rem;font-weight:600;color:#FF8A3D}
+.intro h2{font-family:var(--display);font-weight:700;letter-spacing:-.04em!important;font-size:1.7rem;line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.intro p{margin:0}
+.duo{display:flex;gap:8px;flex-wrap:wrap}
+.duo span{font-family:var(--display);font-weight:800;font-size:.9rem;padding:6px 12px;border-radius:8px;border:2px solid}
+.duo .g{color:var(--scam);background:var(--scam-soft)} .duo .c{color:var(--safe);background:var(--safe-soft)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:.9rem}
+.field input{font:inherit;font-size:16px;padding:13px 16px;border-radius:14px;border:1.5px solid var(--line);background:rgba(0,0,0,.35);color:var(--ink)}
+.field input:focus-visible{outline:none;border-color:var(--accent)}
+.field small{color:var(--muted);font-size:.8rem}
+
+/* ---- post (sempre claro, como no app real) ---- */
+.post{background:var(--post-bg);color:var(--post-ink);border-radius:22px;overflow:hidden;border:1px solid var(--post-line);box-shadow:0 6px 24px rgba(20,22,40,.12);position:relative}
+.p-head{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.avatar{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;color:#fff;font-size:.9rem}
+.who{min-width:0;flex:1}
+.who b{display:flex;align-items:center;gap:4px;font-size:.92rem}
+.who small{display:block;color:var(--post-muted);font-size:.78rem}
+.verified{width:14px;height:14px;border-radius:50%;background:#3b82f6;display:inline-grid;place-items:center;color:#fff;font-size:9px;font-weight:800}
+.dots{color:var(--post-muted);font-weight:700;letter-spacing:1px}
+.media{aspect-ratio:1/1;max-width:100%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff;overflow:hidden}
+.media .kind{position:absolute;top:12px;left:12px;font-size:.72rem;font-weight:700;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:6px;letter-spacing:.04em;text-transform:uppercase}
+.media h3{font-family:var(--display);font-weight:800;font-size:1.65rem;line-height:1.05;margin:0 0 6px;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.media p{margin:0;font-size:.95rem;font-weight:500;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+/* com arte: ela ocupa um quadro quadrado e o título vai numa faixa escura logo abaixo, para os marcadores continuarem com onde se apoiar */
+.media.has-real{aspect-ratio:auto;padding:0;background:#14161f!important}
+.media .frame{position:relative;aspect-ratio:1/1;overflow:hidden}
+.media .real{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.media.has-real > .sig, .media.has-real > p{background:#14161f;margin:0;padding:10px 14px 6px}
+.media.has-real h3{font-size:1.35rem;margin:0;text-shadow:none}
+.media.has-real > p{padding:4px 14px 12px;font-size:.88rem;text-shadow:none;opacity:.9}
+/* artes desenhadas em HTML: quadro fixo de 1080px, escalado para a largura do post (--s, definido em fitArt) */
+.art{position:absolute;left:0;top:0;width:1080px;height:1080px;overflow:hidden;color:#fff;font-family:var(--body);font-size:16px;line-height:1.2;transform-origin:0 0;transform:scale(var(--s,.4))}
+.art *{box-sizing:border-box}
+.art .d{font-family:"Space Grotesk",var(--display);font-weight:700;letter-spacing:-.04em;line-height:.95}
+.art .abs{position:absolute}
+.art .chip{display:inline-block;padding:14px 28px;border-radius:999px;font-weight:900;font-size:38px}
+.watermark{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.watermark span{transform:rotate(-24deg);font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.14em;color:rgba(255,255,255,.28);border:2px solid rgba(255,255,255,.28);padding:6px 12px;border-radius:6px;white-space:nowrap}
+.cta-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--post-line);background:#f6f7fb}
+.cta-bar .dom{font-size:.78rem;color:var(--post-muted);min-width:0}
+.cta-bar .dom-t{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cta-bar .btn{flex:none;background:#2f5bea;color:#fff;font-weight:700;font-size:.85rem;padding:7px 12px;border-radius:8px}
+.caption{padding:10px 12px 4px;font-size:.9rem}
+.caption b{font-weight:700}
+.comments{padding:2px 12px 12px;font-size:.8rem;color:var(--post-muted)}
+
+/* marcadores de sinal: laranja nos golpes, verde nos confiáveis */
+.sig{position:relative;border-radius:8px;transition:box-shadow .25s}
+.marked{--mk:var(--flag);--mk-ink:#fff}
+.marked.okd{--mk:var(--safe);--mk-ink:#062b14}
+.marked .sig.on{box-shadow:0 0 0 3px var(--mk)}
+.sig .n{display:none}
+.marked .sig.on > .n{display:grid;position:absolute;top:-9px;right:-6px;min-width:22px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:11px;background:var(--mk);color:var(--mk-ink);font-weight:800;font-size:.75rem;place-items:center;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+/* elementos que encostam na borda do post (que corta o que sai dele): número vai para dentro */
+.marked .media.sig.on > .n{top:44px;right:auto;left:12px}
+.marked .media.has-real.sig.on > .n{top:12px;right:12px;left:auto}
+.marked .media.has-real.sig.on{box-shadow:inset 0 0 0 3px var(--mk)}
+.marked .caption.sig.on > .n, .marked .comments.sig.on > .n{right:8px}
+.marked .media.has-real > .sig.on{box-shadow:inset 0 0 0 3px var(--mk)}
+.marked .media.has-real > .sig.on > .n{right:8px}
+
+/* ---- votos: fixos no rodapé para o celular não esconder os botões ---- */
+.vote{position:sticky;bottom:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-block:14px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 30%)}
+.vote button{font:inherit;font-family:var(--display);font-weight:700;font-size:1.2rem;padding:16px 10px;border-radius:18px;border:2px solid transparent;cursor:pointer;transition:transform .12s}
+.vote button:active{transform:scale(.97)}
+.vote button:focus-visible,.next:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#bSafe{background:var(--safe-soft);color:var(--safe);border-color:var(--safe);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+#bScam{background:var(--g);color:#fff;border-color:#F16001;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+
+/* ---- revelação ---- */
+.reveal{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.verdict{display:flex;align-items:center;gap:10px}
+.stamp{font-family:var(--display);font-weight:800;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:6px}
+.stamp.scam{background:var(--scam);color:#fff} .stamp.safe{background:var(--safe);color:#fff}
+.verdict b{font-size:1rem}
+.reveal h4{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.reveal ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.reveal li{display:grid;grid-template-columns:24px 1fr;gap:9px;align-items:start;font-size:.93rem}
+.reveal li .n{width:22px;height:22px;border-radius:50%;background:var(--flag);color:#fff;font-weight:800;font-size:.75rem;display:grid;place-items:center}
+.reveal li .n.g{background:var(--safe);color:#062b14}
+.reveal li .n.tip{background:#fff;color:#111}
+.case{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin:0}
+.case a{color:var(--accent);font-weight:600}
+.next{font:inherit;font-weight:700;background:linear-gradient(90deg,#C10801,#F16001);color:#fff;border:0;border-radius:16px;padding:15px;cursor:pointer;font-size:1.05rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.next.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+
+/* ---- final ---- */
+.end{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.result{display:flex;flex-direction:column;gap:2px;padding:18px;border-radius:20px;background:var(--g);border:0;color:#fff}
+.result .prompt,.result .who-r{color:rgba(255,255,255,.85)}
+.result .who-r{font-weight:700;color:var(--muted);font-size:.9rem}
+.end .big{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;font-variant-numeric:tabular-nums}
+.level{font-family:var(--display);font-weight:700;font-size:1.25rem;color:#fff}
+.missed{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.missed li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.missed li span:last-child{color:var(--muted);white-space:nowrap}
+.soon{margin:0;background:rgba(241,96,1,.16);border:1px solid rgba(241,96,1,.5);color:var(--ink);border-radius:16px;padding:14px 16px;font-weight:600}
+.end h2{font-family:var(--display);font-size:1.3rem;margin:0}
+.check{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;counter-reset:c}
+.check li{counter-increment:c;display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:.95rem}
+.check li::before{content:counter(c);width:26px;height:26px;border-radius:7px;background:var(--accent);color:var(--on-accent);font-weight:800;display:grid;place-items:center;font-size:.85rem}
+.foot{font-size:.78rem;color:var(--muted);text-align:center;margin:0}
+
+/* ---- resultado da sala no fim do jogo ---- */
+.room{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.room > div{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.room small{display:block;color:var(--muted);font-size:.78rem}
+.room b{display:block;font-family:var(--display);font-weight:800;font-size:1.5rem;font-variant-numeric:tabular-nums}
+.room b.sm{font-size:1.05rem}
+.room .wide{grid-column:1/-1}
+
+/* ---- tela do telão (#telao): QR à esquerda, placar à direita ---- */
+body.tv .wrap{max-width:1280px}
+.tv-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:36px;align-items:start;padding-block:12px}
+@media (max-width:860px){.tv-grid{grid-template-columns:1fr}}
+.tv-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding-block:16px}
+.tv-card h1{font-size:clamp(2.4rem,5.5vw,4.4rem)}
+.tv-sub{margin:0;font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);max-width:30ch;text-wrap:balance}
+.qr{background:#fff;padding:18px;border-radius:20px;line-height:0}
+.qr img{display:block;width:min(320px,62vw);height:auto}
+.tv-url{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(1rem,2.2vw,1.5rem);overflow-wrap:anywhere}
+.tv-live{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.tv-live h2{font-family:var(--display);font-weight:800;font-size:1.35rem;margin:0 0 8px}
+.tv-count{margin:0;font-size:1.1rem;color:var(--muted)}
+.tv-count b{font-family:var(--display);font-weight:800;font-size:1.7rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.tv-note{margin:-6px 0 10px;font-size:.85rem;color:var(--muted)}
+.rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;counter-reset:r}
+.rank li{counter-increment:r;display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:12px;align-items:baseline;font-size:1.15rem;padding:7px 0;border-bottom:1px solid var(--line)}
+.rank li::before{content:counter(r) "º";font-family:var(--display);font-weight:800;color:var(--muted)}
+.rank li:first-child::before{color:var(--accent)}
+.rank li.empty{display:block;color:var(--muted);font-size:1rem;border:0}
+.rank li.empty::before{content:none}
+.rank .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .st{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.rank .pt{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;min-width:3.2ch;text-align:right}
+.bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.bars li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline}
+.bars li.empty{display:block;color:var(--muted)}
+.bars .lb{font-weight:600;min-width:0}
+.bars .lb small{color:var(--muted);font-weight:500;margin-left:4px}
+.bars .vl{font-weight:700;font-variant-numeric:tabular-nums}
+.bars .tr{grid-column:1/-1;height:10px;border-radius:2px;background:var(--bg);overflow:hidden}
+.bars .fl{display:block;height:100%;background:linear-gradient(90deg,#C10801,#F16001);border-radius:0 4px 4px 0}
+.reset{align-self:flex-start;font:inherit;font-size:.85rem;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer}
+.reset.armed{border-color:var(--scam);color:var(--scam);font-weight:700}
+.reset:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---- telão maior para o projetor + pódio ---- */
+body.tv .wrap{max-width:1680px;padding:28px 40px}
+body.tv .tv-grid{gap:48px;align-items:center;min-height:calc(100vh - 80px)}
+body.tv .tv-card h1{font-size:clamp(3rem,6vw,5.6rem);line-height:.95}
+body.tv .tv-sub{font-size:clamp(1.2rem,1.8vw,1.6rem)}
+body.tv .qr{border-radius:32px;padding:24px;box-shadow:0 0 0 1.5px rgba(255,255,255,.4),0 40px 100px -30px rgba(241,96,1,.6)}
+body.tv .qr img{width:min(380px,60vw)}
+body.tv .tv-live{border-radius:32px;padding:30px 34px}
+body.tv .tv-live h2{font-size:1.7rem;letter-spacing:-.03em}
+body.tv .tv-count{font-size:1.3rem}
+body.tv .tv-count b{font-size:2.1rem}
+body.tv .rank li{font-size:1.5rem;padding:10px 0;grid-template-columns:44px minmax(0,1fr) auto auto}
+body.tv .rank li:first-child .pt{color:#FF8A3D}
+body.tv .rank li:first-child::before{color:#FF8A3D}
+body.tv .bars .lb,body.tv .bars .vl{font-size:1.2rem}
+.tv-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.tv-actions .next{padding:14px 26px;font-size:1.15rem}
+.podio{position:fixed;inset:0;z-index:30;background:#060606;display:none;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:40px;overflow:hidden}
+.podio::before{content:"";position:absolute;left:-10%;right:-10%;bottom:-30vh;height:70vh;border-radius:50%;background:linear-gradient(100deg,#D9C3AB 0%,#F16001 24%,#C10801 62%,#000 100%);filter:blur(100px);opacity:.5;pointer-events:none}
+.podio>*{position:relative}
+.podio.on{display:flex}
+.podio h2{font-family:var(--display);font-size:clamp(2.6rem,5vw,4.8rem);font-weight:700;letter-spacing:-.045em;margin:0;text-align:center}
+.pods{display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:28px;align-items:end;width:min(1000px,100%)}
+.pod{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;min-width:0}
+.pod .nm{font-size:clamp(1.4rem,2.6vw,2.2rem);font-weight:700;letter-spacing:-.02em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .pt{font-size:clamp(1.05rem,1.8vw,1.5rem);color:var(--muted)}
+.pod .blk{width:100%;border-radius:30px 30px 10px 10px;background:var(--g);display:grid;place-items:start center;padding-top:22px;font-size:clamp(2.6rem,5vw,4.8rem);font-weight:700;color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 30px 80px -30px rgba(241,96,1,.7)}
+.pod.p1 .blk{height:340px}.pod.p2 .blk{height:240px}.pod.p3 .blk{height:170px}
+.podio.on .blk{transform-origin:bottom;animation:sobe .9s cubic-bezier(.2,.8,.2,1) both}
+.podio.on .pod .nm,.podio.on .pod .pt{animation:aparece .5s ease both}
+.podio.on .p3 .blk{animation-delay:.1s}.podio.on .p3 .nm,.podio.on .p3 .pt{animation-delay:.7s}
+.podio.on .p2 .blk{animation-delay:.9s}.podio.on .p2 .nm,.podio.on .p2 .pt{animation-delay:1.5s}
+.podio.on .p1 .blk{animation-delay:1.8s}.podio.on .p1 .nm,.podio.on .p1 .pt{animation-delay:2.5s}
+@keyframes sobe{from{transform:scaleY(0)}}
+@keyframes aparece{from{opacity:0;transform:translateY(16px)}}
+.podio .pior{font-size:clamp(1.1rem,1.8vw,1.5rem);color:var(--muted);text-align:center;margin:0}
+.podio .pior b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.podio.on .blk,.podio.on .pod .nm,.podio.on .pod .pt{animation:none}}
+
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Golpe ou <span>Confiável?</span></h1>
+    <div class="score" id="score" aria-live="polite">0 pts</div>
+  </header>
+  <div class="progress" id="progress"></div>
+  <p class="prompt" id="prompt"></p>
+  <main id="stage"></main>
+  <p class="foot">Casos reconstituídos a partir de golpes reais noticiados. Links, QR codes, chaves Pix e telefones foram removidos. ABEX I · Unochapecó.</p>
+</div>
+
+<!-- integrity: o navegador só executa o script se o conteúdo for exatamente o esperado -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" integrity="sha384-qn4Jh88HhJA8dplNQyGjOh9OGI4izVhrfj/qIFgaKcdgOE06pXqIKGlsCILZcLAC" crossorigin="anonymous"></script>
+<script>
+// Link público do jogo, que vira QR code na tela do telão (abra o jogo com #telao no final).
+// Vazio = usa o próprio endereço onde a página está hospedada.
+const JOGO_URL = "https://lightdsgn.github.io/abex2026-2/jogo/";
+
+// Placar ao vivo (Firebase / Firestore). Essas chaves de app web não são segredo.
+// Se o Firebase não carregar, o jogo funciona normalmente, só sem placar.
+const FIREBASE = {
+  apiKey: "AIzaSyANbzsvQM0E5zIUGRQBlTS2UAexQZ2W43o",
+  authDomain: "abex-ed9c2.firebaseapp.com",
+  projectId: "abex-ed9c2",
+  storageBucket: "abex-ed9c2.firebasestorage.app",
+  messagingSenderId: "1083213179431",
+  appId: "1:1083213179431:web:4c4d18a2f2d0ac5be4fc02"
+};
+
+// Cada caso tem a arte desenhada em HTML/CSS/SVG num quadro de 1080×1080 (campo art), escalada para o post.
+// Tudo inventado para o jogo (continua com a marca "reconstituição").
+// Para usar um print de anúncio real no lugar da arte: src:"midia/arquivo.png", real:true, e a fonte em midia/FONTES.md.
+// Sinais: flags (golpe) e ok (confiável) são [onde marcar no post, texto]. Onde marcar: page, media, title, dom, cta, caption, comments, ou null (só na lista).
+// A ordem dos casos é sorteada para cada jogador.
+const CASES = [
+  {
+    id:"bonus", golpe:true, page:"Bônus Brasil Oficial", sub:"Patrocinado", av:"#0f7b3f", ini:"BB",
+    bg:"linear-gradient(160deg,#0c3b24,#0f7b3f 55%,#e2b007)", video:true,
+    kind:"Vídeo · 0:42",
+    title:"“Saquei R$ 4.800 na primeira semana”",
+    sub2:"Ex-jogador famoso recomenda a plataforma",
+    dom:"[link removido]", cta:"Jogar agora",
+    caption:"A plataforma que o Fenômeno usa 🔥 Cadastro com bônus liberado SÓ HOJE.",
+    comments:"Comentários desativados",
+    flags:[
+      ["media","O vídeo é deepfake: rosto e voz de um ex-jogador famoso gerados por IA."],
+      ["title","Promessa de ganho rápido e alto. Nenhuma plataforma legítima garante lucro."],
+      ["caption","Urgência artificial: “só hoje” serve para você não parar para pensar."],
+      ["comments","Comentários desativados escondem as pessoas reclamando que perderam dinheiro."]
+    ],
+    caso:"A Meta processou golpistas por um vídeo falso do Ronaldo usado para promover cassino online. Os anúncios usavam “cloaking”: mostravam uma versão inocente para a revisão da plataforma e outra para o público.",
+    fonte:"Tecnoblog", url:"https://tecnoblog.net/noticias/meta-processa-golpistas-por-uso-de-videos-falsos-de-celebridades/",
+    art:`<div class="art" style="background:radial-gradient(circle at 70% 25%,#2fd17a 0,#0f7b3f 35%,#06301a 75%)">
+  <div class="abs" style="inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 60px,transparent 60px 120px)"></div>
+  <svg class="abs" style="left:40px;top:150px" width="460" height="760" viewBox="0 0 460 760">
+    <circle cx="230" cy="150" r="105" fill="#062414"/>
+    <path d="M40 760 C40 470 110 300 230 300 C350 300 420 470 420 760Z" fill="#062414"/>
+    <text x="230" y="560" text-anchor="middle" font-family="Bricolage Grotesque, Arial" font-weight="800" font-size="190" fill="#0f7b3f">9</text>
+  </svg>
+  <div class="abs" style="right:60px;top:150px;width:470px;background:#fff;color:#14161f;border-radius:44px;padding:40px;box-shadow:0 30px 80px rgba(0,0,0,.45)">
+    <div style="font-size:30px;font-weight:700;color:#6b6f80">Seu saldo</div>
+    <div class="d" style="font-size:96px;margin:8px 0 18px">R$ 4.800</div>
+    <div style="background:#e2f5ec;color:#13865a;border-radius:20px;padding:18px 22px;font-weight:900;font-size:32px">✔ Saque aprovado</div>
+    <div style="margin-top:22px;display:flex;gap:12px">
+      <div style="flex:1;height:22px;border-radius:11px;background:#e6e8ef"></div>
+      <div style="flex:.6;height:22px;border-radius:11px;background:#e6e8ef"></div>
+    </div>
+  </div>
+  <div class="abs chip" style="right:60px;top:560px;background:#e2b007;color:#2a1d00">BÔNUS LIBERADO</div>
+  <div class="abs" style="right:110px;top:660px;font-size:80px">🪙 💰 🪙</div>
+</div>`
+  },
+  {
+    id:"loja", golpe:false, page:"Loja Ventania", sub:"Patrocinado", av:"#2f5bea", ini:"LV", verified:true,
+    bg:"linear-gradient(150deg,#1d2b64,#2f5bea 60%,#8ea8ff)",
+    kind:"Foto", title:"Tênis de corrida: 15% off",
+    sub2:"De R$ 389 por R$ 330 até domingo",
+    dom:"lojaventania.com.br", cta:"Comprar",
+    caption:"Promoção de aniversário da loja. Frete grátis acima de R$ 299. Troca em 30 dias.",
+    comments:"Ver todos os 184 comentários",
+    ok:[
+      ["title","Desconto realista: 15%, não 80%."],
+      ["dom","O link leva ao mesmo domínio da loja, que aparece no perfil."],
+      ["caption","Política de troca e frete claras."],
+      ["comments","Comentários abertos, com muita gente comentando."],
+      [null,"Mesmo assim, o hábito seguro é digitar o endereço da loja você mesmo em vez de clicar no anúncio."]
+    ],
+    caso:"Anúncio legítimo, criado para o jogo. Nem todo anúncio é golpe: o que separa os dois são os sinais.",
+    art:`<div class="art" style="background:linear-gradient(150deg,#1d2b64,#2f5bea 60%,#8ea8ff)">
+  <div class="abs" style="left:-120px;top:120px;width:900px;height:900px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
+  <svg class="abs" style="left:110px;top:200px" width="820" height="440" viewBox="0 0 820 440">
+    <path d="M60 300 C60 220 120 200 200 190 C300 175 360 90 430 70 C470 60 500 90 520 130 C560 200 650 210 740 240 C800 260 800 330 760 350 L100 350 C70 350 60 330 60 300Z" fill="#ffffff"/>
+    <path d="M430 70 C470 60 500 90 520 130 C540 170 570 190 610 200 L560 240 C500 220 450 180 420 120Z" fill="#ff6b3d"/>
+    <path d="M200 200 C300 260 520 270 760 260" stroke="#2f5bea" stroke-width="14" fill="none"/>
+    <rect x="60" y="340" width="720" height="44" rx="22" fill="#14161f"/>
+    <g stroke="#14161f" stroke-width="10" stroke-linecap="round"><line x1="455" y1="110" x2="400" y2="150"/><line x1="480" y1="140" x2="425" y2="180"/><line x1="505" y1="170" x2="450" y2="210"/></g>
+  </svg>
+  <div class="abs" style="right:70px;top:110px;width:250px;height:250px;border-radius:50%;background:#ffcf33;color:#1d2b64;display:grid;place-items:center;text-align:center;transform:rotate(12deg);box-shadow:0 20px 50px rgba(0,0,0,.3)">
+    <div><div class="d" style="font-size:110px">15%</div><div style="font-size:44px;font-weight:900">OFF</div></div>
+  </div>
+  <div class="abs" style="left:80px;top:140px;font-size:40px;font-weight:700;opacity:.9">LOJA VENTANIA · CORRIDA</div>
+</div>`
+  },
+  {
+    id:"restaurante", golpe:true, page:"Promo Restaurantes BR", sub:"Patrocinado", av:"#a3361b", ini:"PR",
+    bg:"linear-gradient(160deg,#3d1206,#a3361b 55%,#f08a24)", video:true,
+    kind:"Vídeo · 0:31",
+    title:"Rodízio completo por R$ 19,90",
+    sub2:"Apresentador de TV anuncia cupom de rede de restaurantes",
+    dom:"[link removido]", cta:"Pegar cupom",
+    caption:"Cupom liberado só para os 500 primeiros! Pague no Pix e apresente no restaurante.",
+    comments:"Ver 3 comentários",
+    flags:[
+      ["media","Deepfake: imagem e voz de um apresentador famoso criadas por IA."],
+      ["title","Preço impossível para o produto. Desconto bom demais é o principal alerta."],
+      ["caption","“Só para os 500 primeiros” cria pressa, e o pagamento antecipado por Pix não tem como ser estornado."],
+      ["page","A página não é o perfil oficial do restaurante nem do apresentador."]
+    ],
+    caso:"Um trio foi preso no DF por usar deepfake da imagem e da voz de Marcos Mion num anúncio de desconto inexistente no Outback.",
+    fonte:"Mais Goiás", url:"https://www.maisgoias.com.br/brasil/policia-prende-trio-por-golpes-digitais-com-uso-de-imagens-de-famosos-no-df/",
+    art:`<div class="art" style="background:linear-gradient(160deg,#3d1206,#a3361b 55%,#f08a24)">
+  <div class="abs" style="left:60px;top:135px"><span class="chip" style="background:#d6293f;color:#fff">● AO VIVO</span></div>
+  <svg class="abs" style="left:40px;top:190px" width="420" height="720" viewBox="0 0 420 720">
+    <circle cx="210" cy="140" r="100" fill="#2a0c03"/>
+    <path d="M30 720 C30 440 100 280 210 280 C320 280 390 440 390 720Z" fill="#2a0c03"/>
+    <rect x="290" y="330" width="34" height="150" rx="14" fill="#555" transform="rotate(20 307 405)"/>
+    <circle cx="282" cy="330" r="34" fill="#777"/>
+  </svg>
+  <div class="abs" style="right:60px;top:180px;width:520px;background:#fff7ec;color:#3d1206;border-radius:36px;padding:44px;box-shadow:0 30px 80px rgba(0,0,0,.4);border:6px dashed #f08a24">
+    <div style="font-size:34px;font-weight:900;color:#a3361b">CUPOM DE DESCONTO</div>
+    <div style="font-size:120px;line-height:1;margin:14px 0">🍖🥩</div>
+    <div class="d" style="font-size:110px">R$ 19,90</div>
+    <div style="font-size:32px;font-weight:700;margin-top:10px">rodízio completo</div>
+  </div>
+  <div class="abs chip" style="right:60px;top:720px;background:#ffcf33;color:#3d1206">SÓ 500 CUPONS!</div>
+</div>`
+  },
+  {
+    id:"libera", golpe:true, page:"Libera Brasil Gov", sub:"Patrocinado", av:"#1b5e20", ini:"LB",
+    bg:"linear-gradient(160deg,#0b2b10,#1b5e20 50%,#f9c513)",
+    kind:"Foto",
+    title:"Limpe seu nome por R$ 49",
+    sub2:"Novo programa do governo para quitar dívidas",
+    dom:"[link removido]", cta:"Consultar CPF",
+    caption:"Consulte se seu CPF tem direito. Programa termina esta semana!",
+    comments:"Comentários desativados",
+    flags:[
+      ["page","Página que se passa por governo. Órgão público não anuncia como “Gov” em perfil genérico."],
+      ["title","Programa inexistente. O nome imita um programa real para parecer oficial."],
+      ["cta","“Consultar CPF” serve para roubar seus dados pessoais."],
+      ["caption","Prazo curto e falso para apressar a decisão."]
+    ],
+    caso:"O Netlab, da UFRJ, encontrou 544 anúncios fraudulentos nas plataformas da Meta usando o nome do Desenrola Brasil ou de um programa inexistente chamado “Libera Brasil”.",
+    fonte:"Olhar Digital", url:"https://olhardigital.com.br/2026/07/31/seguranca/desenrola-brasil-veja-como-anuncios-falsos-tentam-enganar-usuarios/",
+    art:`<div class="art" style="background:linear-gradient(160deg,#0b2b10,#1b5e20 50%,#f9c513)">
+  <div class="abs" style="left:60px;top:135px;display:flex;align-items:center;gap:20px">
+    <svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="42" fill="#f9c513"/><circle cx="45" cy="45" r="28" fill="#1b5e20"/><path d="M28 47 L40 58 L63 34" stroke="#fff" stroke-width="8" fill="none" stroke-linecap="round"/></svg>
+    <div><div style="font-size:42px;font-weight:900">PROGRAMA LIBERA BRASIL</div><div style="font-size:28px;font-weight:700;opacity:.85">"novo programa do governo"</div></div>
+  </div>
+  <div class="abs" style="left:60px;right:60px;top:280px;background:#fff;color:#0b2b10;border-radius:40px;padding:48px;box-shadow:0 30px 80px rgba(0,0,0,.4)">
+    <div style="font-size:40px;font-weight:900">Consulte se seu CPF tem direito</div>
+    <div style="margin:28px 0;border:4px solid #c9d3c9;border-radius:20px;padding:26px 30px;font-size:46px;color:#9aa69a;letter-spacing:.06em">000.000.000-00</div>
+    <div style="background:#1b5e20;color:#fff;border-radius:20px;padding:26px;text-align:center;font-size:44px;font-weight:900">CONSULTAR CPF</div>
+  </div>
+  <div class="abs chip" style="right:60px;top:760px;background:#d6293f;color:#fff">⏰ TERMINA ESTA SEMANA</div>
+</div>`
+  },
+  {
+    id:"prefeitura", golpe:false, page:"Prefeitura de Vila Serena", sub:"Patrocinado", av:"#0f5ea8", ini:"VS", verified:true,
+    bg:"linear-gradient(160deg,#083a66,#0f5ea8 55%,#62b6f0)",
+    kind:"Foto",
+    title:"Vacinação contra a gripe começa segunda",
+    sub2:"Gratuita e sem agendamento, em todos os postos de saúde",
+    dom:"vilaserena.sp.gov.br/vacina", cta:"Saiba mais",
+    caption:"Leve documento com foto e cartão do SUS. A prefeitura não pede dados, CPF ou pagamento por mensagem ou link.",
+    comments:"Ver todos os 96 comentários",
+    ok:[
+      ["dom","O endereço termina em .gov.br, domínio que só órgãos públicos conseguem registrar."],
+      ["cta","O botão só leva a informações. Não pede CPF, cadastro nem pagamento."],
+      ["caption","A própria prefeitura avisa que não pede dados por mensagem."],
+      [null,"Na dúvida, confira no site ou nas redes oficiais da prefeitura da sua cidade."]
+    ],
+    caso:"Anúncio legítimo, criado para o jogo. Órgão público de verdade usa endereço .gov.br e não cobra nada para dar informação. Programas falsos costumam pedir CPF ou uma “taxa”.",
+    art:`<div class="art" style="background:linear-gradient(160deg,#083a66,#0f5ea8 55%,#62b6f0)">
+  <div class="abs" style="right:-160px;top:-160px;width:620px;height:620px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+  <div class="abs" style="left:60px;top:120px;display:flex;align-items:center;gap:22px">
+    <svg width="96" height="96" viewBox="0 0 96 96"><path d="M48 6 L86 20 V48 C86 70 70 84 48 92 C26 84 10 70 10 48 V20Z" fill="#fff"/><path d="M40 30h16v12h12v16H56v12H40V58H28V42h12z" fill="#0f5ea8"/></svg>
+    <div><div style="font-size:34px;font-weight:900">PREFEITURA DE VILA SERENA</div><div style="font-size:28px;font-weight:700;opacity:.85">Secretaria Municipal de Saúde</div></div>
+  </div>
+  <div class="abs d" style="left:60px;top:270px;font-size:118px">VACINAÇÃO<br>CONTRA A GRIPE</div>
+  <div class="abs" style="left:60px;right:60px;top:540px;background:#fff;color:#083a66;border-radius:36px;padding:40px 44px;box-shadow:0 30px 80px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:20px">
+    <div style="font-size:38px;font-weight:900">Todos os postos de saúde</div>
+    <div style="font-size:36px;font-weight:700">Segunda a sexta, das 8h às 17h</div>
+    <div style="font-size:36px;font-weight:700">Leve documento com foto e cartão do SUS</div>
+  </div>
+  <div class="abs chip" style="left:60px;top:880px;background:#ffd23f;color:#083a66">GRATUITO · SEM AGENDAMENTO</div>
+</div>`
+  },
+  {
+    id:"blackfriday", golpe:false, page:"Eletro Vale", sub:"Patrocinado", av:"#1a1a1a", ini:"EV", verified:true,
+    bg:"linear-gradient(160deg,#000,#2a2a2a 60%,#ffd400)",
+    kind:"Foto",
+    title:"TV 50\" 4K de R$ 2.799 por R$ 1.999",
+    sub2:"Black Friday até domingo ou enquanto durar o estoque",
+    dom:"eletrovale.com.br/black-friday", cta:"Comprar",
+    caption:"Black Friday Eletro Vale. Cartão em até 12x sem juros, boleto ou Pix no nosso site. Retire grátis em uma das 40 lojas.",
+    comments:"Ver todos os 1.027 comentários",
+    ok:[
+      ["title","Desconto de 29% é alto, mas comum na Black Friday para esse produto. Não é um preço impossível."],
+      ["media","Tem prazo, mas a Black Friday tem mesmo data para acabar. Pressa sozinha não prova golpe; o que pesa é a pressa junto com outros sinais."],
+      ["caption","Várias formas de pagamento dentro do site da loja, e retirada em loja física."],
+      ["page","Página verificada, com o mesmo nome do domínio, e comentários abertos."],
+      [null,"Mesmo assim, digite o endereço da loja no navegador em vez de clicar e confira se o preço é o mesmo lá."]
+    ],
+    caso:"Anúncio legítimo, criado para o jogo. Na Black Friday aparecem muitas lojas falsas copiando ofertas reais, então o hábito de digitar o endereço vale ainda mais nessa época.",
+    art:`<div class="art" style="background:radial-gradient(circle at 78% 26%,#3d3d3d,#161616 50%,#000 85%)">
+  <div class="abs" style="left:60px;top:120px;font-size:38px;font-weight:900;letter-spacing:.08em;color:#ffd400">ELETRO VALE</div>
+  <div class="abs d" style="left:60px;top:190px;font-size:150px">BLACK<br>FRIDAY</div>
+  <svg class="abs" style="left:610px;top:150px" width="420" height="330" viewBox="0 0 420 330">
+    <rect x="0" y="0" width="420" height="260" rx="16" fill="#2b2b2b"/>
+    <rect x="14" y="14" width="392" height="232" rx="8" fill="#1d4ed8"/>
+    <path d="M14 200 L120 120 L200 180 L300 90 L406 170 L406 246 L14 246Z" fill="#60a5fa"/>
+    <circle cx="330" cy="70" r="28" fill="#fde68a"/>
+    <rect x="190" y="260" width="40" height="40" fill="#2b2b2b"/>
+    <rect x="120" y="296" width="180" height="18" rx="9" fill="#2b2b2b"/>
+  </svg>
+  <div class="abs" style="left:60px;top:530px;width:560px;background:#fff;color:#111;border-radius:36px;padding:40px 44px;box-shadow:0 30px 80px rgba(0,0,0,.5)">
+    <div style="font-size:34px;font-weight:700;color:#555">TV 50" 4K</div>
+    <div style="font-size:34px;font-weight:700;color:#888;text-decoration:line-through;margin-top:10px">de R$ 2.799</div>
+    <div class="d" style="font-size:116px;margin:6px 0 12px">R$ 1.999</div>
+    <div style="font-size:30px;font-weight:700">em até 12x sem juros</div>
+  </div>
+  <div class="abs" style="right:80px;top:540px;width:230px;height:230px;border-radius:50%;background:#ffd400;color:#111;display:grid;place-items:center;transform:rotate(-10deg)"><div class="d" style="font-size:92px">-29%</div></div>
+  <div class="abs chip" style="right:60px;top:830px;background:#fff;color:#111">ATÉ DOMINGO</div>
+</div>`
+  },
+  {
+    id:"parente", golpe:true, page:"+55 49 9 8xxx-0217", sub:"WhatsApp · número não salvo", av:"#3b4a54", ini:"?",
+    bg:"#0b141a", kind:"Mensagem",
+    title:"“Oi mãe, troquei de número”",
+    sub2:"Mensagem de um número desconhecido",
+    dom:"Este número não está nos seus contatos", cta:"Responder",
+    caption:"Consegue me fazer um Pix de R$ 1.850 agora? Amanhã te devolvo, é urgente.",
+    comments:"A foto do perfil é igual à do seu filho",
+    flags:[
+      ["page","Número novo, que não está salvo no seu celular. O golpista sempre diz que “trocou de número”."],
+      ["caption","Pedido de dinheiro com pressa: “agora”, “urgente”, “amanhã te devolvo”."],
+      ["comments","A foto foi copiada do perfil público do seu filho. Foto igual não prova nada."],
+      [null,"Antes de pagar, ligue para o número antigo ou faça uma chamada de vídeo."]
+    ],
+    caso:"O golpe do falso parente é um dos mais comuns no Brasil: o golpista copia a foto pública de alguém da família e pede dinheiro por um número novo.",
+    art:`<div class="art" style="background:#0b141a">
+  <div class="abs" style="left:0;right:0;top:0;height:150px;background:#202c33;display:flex;align-items:center;gap:28px;padding:0 50px 0 230px">
+    <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="48" fill="#6b7c85"/><circle cx="48" cy="38" r="18" fill="#cfd8dc"/><path d="M16 88c4-16 17-25 32-25s28 9 32 25" fill="#cfd8dc"/></svg>
+    <div><div style="font-size:40px;font-weight:700">+55 49 9 8xxx-0217</div><div style="font-size:30px;color:#8696a0">online</div></div>
+  </div>
+  <div class="abs" style="left:50px;top:200px;width:820px;display:flex;flex-direction:column;gap:22px">
+    <div style="align-self:flex-start;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px;line-height:1.25">Oi mãe, tudo bem?</div>
+    <div style="align-self:flex-start;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px;line-height:1.25">Troquei de número, salva esse aqui</div>
+    <div style="align-self:flex-start;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px;line-height:1.25">Meu app do banco travou e preciso pagar um boleto hoje</div>
+    <div style="align-self:flex-start;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px;line-height:1.25">Consegue me fazer um Pix de <b>R$ 1.850</b>? Amanhã te devolvo</div>
+  </div>
+  <div class="abs" style="left:50px;right:50px;bottom:50px;height:96px;border-radius:48px;background:#2a3942;color:#8696a0;font-size:36px;display:flex;align-items:center;padding:0 40px">Mensagem</div>
+</div>`
+  },
+  {
+    id:"voz", golpe:true, page:"Neto (número novo)", sub:"WhatsApp · áudio de 0:24", av:"#7a4b2a", ini:"N",
+    bg:"#0b141a", kind:"Áudio",
+    title:"Áudio: “Vó, bati o carro, me ajuda”",
+    sub2:"A voz é igualzinha à do seu neto",
+    dom:"Número novo, não está nos seus contatos", cta:"Ouvir de novo",
+    caption:"Vó, sou eu! Bati o carro, tô na delegacia e preciso de R$ 2.000 agora pro advogado. Não conta pro pai, por favor.",
+    comments:"Ele pede para você não ligar porque “o celular está sem bateria”",
+    flags:[
+      ["media","A voz pode ser clonada por inteligência artificial. Bastam poucos segundos de um áudio ou vídeo do seu neto nas redes."],
+      ["caption","Pede segredo (“não conta pro pai”) e dinheiro urgente. O golpe tenta te afastar da família."],
+      ["comments","Pedir para você não ligar é para impedir que você confirme a história."],
+      ["dom","Número novo de novo: o mesmo truque do falso parente."],
+      [null,"Combine uma palavra de segurança com a família e ligue de volta para o número que você já conhece."]
+    ],
+    caso:"A Polícia Civil de São Paulo alertou para golpes com voz clonada por IA: criminosos fazem ligações mudas para gravar a voz da vítima e depois criam áudios falsos pedindo dinheiro a parentes.",
+    fonte:"BandNews FM", url:"https://www.band.com.br/bandnews-fm/noticias/policia-alerta-para-golpe-que-usa-ia-para-clonar-voz-de-vitimas-202510101913",
+    art:`<div class="art" style="background:#0b141a">
+  <div class="abs" style="left:0;right:0;top:0;height:150px;background:#202c33;display:flex;align-items:center;gap:28px;padding:0 50px 0 230px">
+    <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="48" fill="#7a4b2a"/><circle cx="48" cy="38" r="18" fill="#f1d3bd"/><path d="M16 88c4-16 17-25 32-25s28 9 32 25" fill="#f1d3bd"/></svg>
+    <div><div style="font-size:40px;font-weight:700">Neto</div><div style="font-size:30px;color:#8696a0">gravando áudio…</div></div>
+  </div>
+  <div class="abs" style="left:50px;top:240px;width:900px;background:#202c33;border-radius:0 40px 40px 40px;padding:40px 44px;display:flex;align-items:center;gap:34px">
+    <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="55" fill="#00a884"/><path d="M44 34 L78 55 L44 76Z" fill="#fff"/></svg>
+    <div style="flex:1;display:flex;align-items:center;gap:7px;height:110px">${[30,52,70,44,88,60,36,74,96,58,40,66,90,48,30,62,84,54,38,72,50,34,64,42,28,56,46,32].map(h=>`<i style="display:block;width:10px;height:${h}px;border-radius:5px;background:#8696a0"></i>`).join('')}</div>
+    <div style="font-size:34px;color:#8696a0">0:24</div>
+  </div>
+  <div class="abs" style="left:50px;top:470px;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px">Vó, me responde rápido</div>
+  <div class="abs" style="left:50px;top:600px;background:#202c33;border-radius:0 30px 30px 30px;padding:24px 32px;font-size:44px">Não liga, tô sem bateria</div>
+  <div class="abs" style="right:50px;bottom:60px;width:560px;border:3px dashed rgba(255,255,255,.35);border-radius:30px;padding:28px 32px;font-size:34px;line-height:1.3;color:#cfd8dc">Voz criada por IA a partir de um vídeo postado nas redes</div>
+</div>`
+  },
+  {
+    id:"inss", golpe:true, page:"INSS-AVISO", sub:"SMS · agora", av:"#1351b4", ini:"IN",
+    bg:"#f2f2f7", kind:"SMS",
+    title:"“Seu benefício será BLOQUEADO em 24h”",
+    sub2:"Mensagem pedindo atualização de cadastro",
+    dom:"inss-atualiza-cadastro.com", cta:"Abrir link",
+    caption:"INSS: Seu beneficio sera BLOQUEADO em 24h por falta de atualizacao cadastral. Regularize agora pelo link.",
+    comments:"O remetente não é um número oficial",
+    flags:[
+      ["title","Ameaça com prazo curto: medo e pressa para você clicar sem pensar."],
+      ["dom","O endereço não termina em .gov.br. Os serviços oficiais do INSS ficam dentro de gov.br."],
+      ["caption","Texto sem acento, com palavra em maiúsculas e ameaça: padrão dos SMS falsos."],
+      [null,"Na dúvida, abra o app Meu INSS ou ligue 135, a central oficial. Nunca pelo link da mensagem."]
+    ],
+    caso:"Golpistas usam o nome do INSS para roubar dados e senhas de aposentados e pensionistas. Qualquer atualização deve ser feita no app Meu INSS ou pelo telefone 135.",
+    art:`<div class="art" style="background:#f2f2f7;color:#111">
+  <div class="abs" style="left:0;right:0;top:0;height:210px;background:#fff;border-bottom:2px solid #e5e5ea;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+    <div style="width:100px;height:100px;border-radius:50%;background:#1351b4;color:#fff;display:grid;place-items:center;font-size:40px;font-weight:700">IN</div>
+    <div style="font-size:34px;font-weight:700">INSS-AVISO</div>
+  </div>
+  <div class="abs" style="left:0;right:0;top:250px;text-align:center;font-size:28px;color:#8e8e93">Mensagem de texto · Hoje 09:12</div>
+  <div class="abs" style="left:50px;top:320px;width:860px;background:#e5e5ea;border-radius:44px 44px 44px 12px;padding:40px 44px;font-size:46px;line-height:1.3">INSS: Seu beneficio sera <b>BLOQUEADO</b> em 24h por falta de atualizacao cadastral. Regularize agora: <span style="color:#0a64d6;text-decoration:underline">inss-atualiza-cadastro.com</span></div>
+  <div class="abs" style="left:50px;right:50px;bottom:50px;height:96px;border-radius:48px;border:2px solid #d1d1d6;background:#fff;color:#8e8e93;font-size:36px;display:flex;align-items:center;padding:0 40px">Mensagem de texto</div>
+</div>`
+  },
+  {
+    id:"central", golpe:true, page:"BANCO-SEGURO", sub:"SMS · 23:14", av:"#3a3a3c", ini:"BS",
+    bg:"#000", kind:"SMS",
+    title:"“Compra de R$ 1.890 aprovada”",
+    sub2:"Não reconhece? Ligue para a central",
+    dom:"0800 [número removido]", cta:"Ligar",
+    caption:"Compra aprovada R$ 1.890,00 em LOJA ONLINE. Nao reconhece? Ligue AGORA para a Central de Seguranca.",
+    comments:"Você não fez nenhuma compra hoje",
+    flags:[
+      ["title","Valor alto e susto à noite: o objetivo é você ligar no impulso."],
+      ["dom","O número da mensagem leva ao golpista, que finge ser a central e pede seus dados e códigos."],
+      ["caption","“Ligue AGORA” cria pressa. O banco de verdade avisa pelo app."],
+      [null,"Não ligue para número de mensagem. Abra o app do banco ou ligue no número atrás do cartão."]
+    ],
+    caso:"É o começo do golpe da falsa central: quem liga cai num falso atendente que pede senha, código ou uma transferência “para proteger a conta”.",
+    art:`<div class="art" style="background:linear-gradient(180deg,#1c1c1e,#000)">
+  <div class="abs" style="left:0;right:0;top:110px;text-align:center;font-size:200px;font-weight:300;letter-spacing:-6px;color:#fff">23:14</div>
+  <div class="abs" style="left:0;right:0;top:340px;text-align:center;font-size:36px;color:#c7c7cc">sábado, 22 de novembro</div>
+  <div class="abs" style="left:50px;right:50px;top:470px;border-radius:44px;background:rgba(255,255,255,.16);padding:34px 38px;display:flex;gap:28px;align-items:flex-start">
+    <div style="width:90px;height:90px;border-radius:22px;background:#34c759;flex:none;display:grid;place-items:center"><svg width="54" height="54" viewBox="0 0 24 24" fill="#fff"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.4 1.3 4.6 3.4 6.1L4.5 21l4.2-2.3c1 .2 2.1.3 3.3.3 5.5 0 10-3.6 10-8s-4.5-8-10-8z"/></svg></div>
+    <div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:30px;color:#c7c7cc"><b style="color:#fff">BANCO-SEGURO</b><span>agora</span></div>
+      <div style="font-size:40px;line-height:1.3;margin-top:10px">Compra aprovada <b>R$ 1.890,00</b> em LOJA ONLINE. Nao reconhece? Ligue AGORA para a Central de Seguranca: 0800 [removido]</div></div>
+  </div>
+</div>`
+  },
+  {
+    id:"emprestimo", golpe:true, page:"Crédito Fácil Já", sub:"Patrocinado", av:"#0b7a3b", ini:"CF",
+    bg:"linear-gradient(160deg,#04361a,#0b7a3b 60%,#d4b106)", kind:"Foto",
+    title:"R$ 10.000 aprovados, mesmo negativado",
+    sub2:"Sem consulta ao SPC e Serasa",
+    dom:"[link removido]", cta:"Quero meu crédito",
+    caption:"Liberação em 10 minutos! Só pagar a taxa de liberação de R$ 290 pelo Pix e o dinheiro cai na hora.",
+    comments:"Comentários desativados",
+    flags:[
+      ["title","Aprovação garantida, sem consulta e para negativado: promessa que nenhuma financeira séria faz."],
+      ["caption","Taxa antecipada: pediu dinheiro para liberar o empréstimo, é golpe."],
+      ["comments","Comentários desativados escondem quem já caiu."],
+      ["page","Não é um banco ou financeira conhecida. Dá para conferir se a empresa é autorizada no site do Banco Central."]
+    ],
+    caso:"O golpe do falso empréstimo cobra uma “taxa de liberação” e desaparece com o dinheiro. Empréstimo de verdade não cobra nada antes de liberar.",
+    art:`<div class="art" style="background:radial-gradient(circle at 75% 20%,#20b35d 0,#0b7a3b 40%,#04361a 85%)">
+  <div class="abs" style="left:70px;top:130px;font-size:44px;font-weight:700;opacity:.85">CRÉDITO FÁCIL JÁ</div>
+  <div class="abs" style="left:70px;top:210px;width:620px;background:#fff;color:#04361a;border-radius:44px;padding:44px;box-shadow:0 30px 80px rgba(0,0,0,.4)">
+    <div style="font-size:34px;font-weight:700;color:#0b7a3b">Seu crédito foi aprovado</div>
+    <div class="d" style="font-size:130px;margin:12px 0">R$ 10.000</div>
+    <div style="background:#e2f5ec;border-radius:20px;padding:18px 24px;font-size:32px;font-weight:700">Mesmo negativado · sem consulta</div>
+  </div>
+  <svg class="abs" style="right:70px;top:230px" width="280" height="280" viewBox="0 0 280 280"><circle cx="140" cy="140" r="130" fill="#d4b106"/><circle cx="140" cy="140" r="100" fill="none" stroke="#04361a" stroke-width="10"/><text x="140" y="178" text-anchor="middle" font-size="120" font-weight="800" fill="#04361a">$</text></svg>
+  <div class="abs chip" style="left:70px;top:720px;background:#d4b106;color:#2a1d00">Só pagar a taxa de liberação</div>
+  <div class="abs chip" style="left:70px;top:830px;background:#fff;color:#04361a">Cai em 10 minutos</div>
+</div>`
+  },
+  {
+    id:"provadevida", golpe:false, page:"Governo Federal", sub:"Patrocinado", av:"#1351b4", ini:"GF", verified:true,
+    bg:"linear-gradient(150deg,#071d41,#1351b4 60%,#2670e8)", kind:"Foto",
+    title:"Prova de vida do INSS é automática",
+    sub2:"Você não precisa ir ao banco nem enviar documentos",
+    dom:"gov.br/inss", cta:"Saiba mais",
+    caption:"A prova de vida é feita pelo cruzamento de dados do governo. Não pedimos dados, fotos ou pagamentos por mensagem.",
+    comments:"Ver todos os 312 comentários",
+    ok:[
+      ["page","Perfil oficial e verificado do Governo Federal."],
+      ["dom","O link fica dentro de gov.br."],
+      ["caption","Só informa. Não pede dados, foto nem pagamento."],
+      ["comments","Comentários abertos, com muita gente participando."],
+      [null,"Mesmo assim, para resolver qualquer coisa, entre direto no app Meu INSS em vez de clicar no anúncio."]
+    ],
+    caso:"Anúncio legítimo criado para o jogo. Desde 2022 a prova de vida do INSS é feita automaticamente, pelo cruzamento de dados do governo.",
+    art:`<div class="art" style="background:linear-gradient(150deg,#071d41,#1351b4 60%,#2670e8)">
+  <div class="abs" style="left:-140px;top:420px;width:900px;height:900px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+  <div class="abs" style="left:80px;top:130px;font-size:40px;font-weight:700;opacity:.9">gov.br · INSS</div>
+  <div class="abs d" style="left:80px;top:220px;width:900px;font-size:120px">Prova de vida agora é automática</div>
+  <svg class="abs" style="right:80px;bottom:120px" width="300" height="300" viewBox="0 0 300 300"><circle cx="150" cy="150" r="140" fill="#fff"/><path d="M90 155 L135 200 L215 110" fill="none" stroke="#1351b4" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="abs" style="left:80px;bottom:130px;width:560px;font-size:44px;line-height:1.25;font-weight:600">Sem ir ao banco. Sem enviar documento. Sem pagar nada.</div>
+</div>`
+  }
+];
+
+// ---------- estado do jogador (salvo no aparelho para sobreviver a recarregar ou bloquear a tela) ----------
+const KEY = 'golpe-ou-confiavel-v4';
+let S = null; // { gid, rodada, treino, inicio, name, order:[índices], i, pts, results:[bool] }
+
+// ---------- placar compartilhado ----------
+// jogos/<gid>: um documento por jogador. config/atual: { rodada } — o botão "Zerar placar" do telão troca a rodada.
+let fdb = null, rodadaAtual = 'geral';
+const aoMudarRodada = [];
+try{
+  if(window.firebase){
+    firebase.initializeApp(FIREBASE);
+    fdb = firebase.firestore();
+    fdb.doc('config/atual').onSnapshot(d=>{
+      rodadaAtual = (d.exists && d.data().rodada) || 'geral';
+      aoMudarRodada.forEach(fn=>fn(rodadaAtual));
+    }, ()=>{});
+  }
+}catch(e){ fdb = null; }
+
+function salvarPlacar(){
+  if(!fdb || !S || S.treino) return;
+  const respostas = {};
+  S.results.forEach((r,k)=>{ respostas[CASES[S.order[k]].id] = r; });
+  fdb.collection('jogos').doc(S.gid).set({
+    rodada:S.rodada, nome:S.name || '', pts:S.pts,
+    acertos:S.results.filter(Boolean).length, respondidas:S.results.length, total:CASES.length,
+    respostas, fim:S.results.length >= CASES.length, inicio:S.inicio,
+    atualizado:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(()=>{});
+}
+// Qualquer pessoa pode escrever no banco, então cada documento é tratado como não confiável:
+// só os campos esperados passam, com o tipo forçado (números viram números, nome vira texto curto).
+function num(v){ const x = Number(v); return Number.isFinite(x) ? Math.max(0, Math.min(x, 1e6)) : 0; }
+function limpar(id, d){
+  d = d || {};
+  const respostas = {};
+  if(d.respostas && typeof d.respostas === 'object')
+    CASES.forEach(c=>{ if(typeof d.respostas[c.id] === 'boolean') respostas[c.id] = d.respostas[c.id]; });
+  return {
+    id, nome: typeof d.nome === 'string' ? d.nome.slice(0,24) : '',
+    pts: num(d.pts), acertos: num(d.acertos), respondidas: num(d.respondidas), total: num(d.total) || CASES.length,
+    fim: d.fim === true, inicio: num(d.inicio), respostas
+  };
+}
+function ouvirSala(rodada, fn){
+  if(!fdb) return ()=>{};
+  return fdb.collection('jogos').where('rodada','==',rodada)
+    .onSnapshot(q=>fn(q.docs.map(d=>limpar(d.id, d.data()))), ()=>{});
+}
+function resumoSala(jogos){
+  const rank = jogos.slice().sort((a,b)=> (b.pts-a.pts) || ((b.fim?1:0)-(a.fim?1:0)) || ((a.inicio||0)-(b.inicio||0)));
+  const porCaso = CASES.map(c=>{
+    let n=0, err=0;
+    jogos.forEach(j=>{ const r = j.respostas && j.respostas[c.id]; if(r!==undefined){ n++; if(!r) err++; } });
+    return {c, n, err, pct: n ? err/n : 0};
+  }).filter(x=>x.n>0).sort((a,b)=> b.pct-a.pct || b.n-a.n);
+  const fim = jogos.filter(j=>j.fim);
+  const media = fim.length ? fim.reduce((s,j)=>s+j.acertos,0)/fim.length : null;
+  return {rank, porCaso, media, nFim:fim.length};
+}
+function pct(x){ return Math.round(x*100) + '%'; }
+
+const stage = document.getElementById('stage');
+const prog = document.getElementById('progress');
+const scoreEl = document.getElementById('score');
+const promptEl = document.getElementById('prompt');
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if(s && Array.isArray(s.order) && s.order.length===CASES.length && Array.isArray(s.results)) return s;
+  }catch(e){}
+  return null;
+}
+function shuffle(n){
+  const a = [...Array(n).keys()];
+  for(let k=n-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+function newGame(name, treino){
+  S = { gid: Date.now().toString(36) + Math.random().toString(36).slice(2,8), rodada: rodadaAtual, treino: !!treino,
+        inicio: Date.now(), name, order:shuffle(CASES.length), i:0, pts:0, results:[] };
+  save(); salvarPlacar();
+}
+function cur(){ return CASES[S.order[S.i]]; }
+
+function drawProgress(){
+  const n = CASES.length, done = S ? S.results.length : 0;
+  prog.innerHTML = CASES.map((_,k)=>{
+    const c = k<done ? (S.results[k]?'ok':'bad') : (S && k===S.i ? 'now' : '');
+    return `<i class="${c}"></i>`;
+  }).join('');
+  scoreEl.textContent = (S ? S.pts : 0) + ' pts';
+}
+
+// escala as artes de 1080px para a largura atual do quadro
+function fitArt(){
+  document.querySelectorAll('.media .frame').forEach(f=>f.style.setProperty('--s', f.clientWidth/1080));
+}
+window.addEventListener('resize', fitArt);
+
+function mediaEl(src){
+  return /\.(mp4|webm|mov)$/i.test(src)
+    ? `<video class="real" src="${esc(src)}" controls playsinline preload="metadata"></video>`
+    : `<img class="real" src="${esc(src)}" alt="Print do anúncio original">`;
+}
+
+// ---------- telas ----------
+function intro(){
+  drawProgress();
+  promptEl.hidden = true;
+  stage.innerHTML = `
+  <section class="intro">
+    <p class="eyebrow">Mini jogo · uns 6 minutos</p>
+    <h2>Você cairia nesses golpes?</h2>
+    <p>São ${CASES.length} casos montados a partir de golpes reais: anúncios, mensagens de WhatsApp e SMS. Alguns são golpe, outros são de verdade. Em cada um, decida:</p>
+    <div class="duo"><span class="c">Confiável</span><span class="g">Golpe</span></div>
+    <p>Depois de cada resposta, mostramos os sinais que entregam o golpe. Cada acerto vale 100 pontos.</p>
+    <div class="field">
+      <label for="nick">Seu apelido</label>
+      <input id="nick" maxlength="24" autocomplete="off" placeholder="Ex.: Ana da 3ª fileira">
+      <small>Aparece no placar projetado para a turma. Use um apelido, não o nome completo.</small>
+    </div>
+    <button class="next" id="go" type="button">Começar</button>
+  </section>`;
+  const nick = document.getElementById('nick');
+  const go = ()=>{ newGame(nick.value.trim().slice(0,24)); promptEl.hidden=false; render(); window.scrollTo({top:0}); };
+  document.getElementById('go').onclick = go;
+  nick.addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+}
+
+function post(c){
+  const art = c.art || '';
+  const src = art ? '' : (c.src || '');
+  const real = !!c.real;
+  const has = art || src;
+  return `
+  <article class="post" id="post">
+    <div class="p-head">
+      <div class="avatar sig" data-k="page" style="background:${c.av}">${esc(c.ini)}<span class="n"></span></div>
+      <div class="who"><b>${esc(c.page)} ${c.verified?'<span class="verified">✓</span>':''}</b><small>${esc(c.sub)}</small></div>
+      <span class="dots">···</span>
+    </div>
+    <div class="media sig${has?' has-real':''}" data-k="media" style="background:${c.bg}">
+      ${has?`<div class="frame">${art || mediaEl(src)}
+        ${real?'':'<div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>'}</div>`:`
+      <div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>`}
+      <span class="kind">${esc(real?'Anúncio real':c.kind)}</span>
+      <div class="sig" data-k="title"><h3>${esc(c.title)}</h3><span class="n"></span></div>
+      <p>${esc(c.sub2)}</p>
+      <span class="n"></span>
+    </div>
+    <div class="cta-bar">
+      <span class="dom sig" data-k="dom"><span class="dom-t">${esc(c.dom)}</span><span class="n"></span></span>
+      <span class="btn sig" data-k="cta">${esc(c.cta)}<span class="n"></span></span>
+    </div>
+    <div class="caption sig" data-k="caption"><b>${esc(c.page)}</b> ${esc(c.caption)}<span class="n"></span></div>
+    <div class="comments sig" data-k="comments">${esc(c.comments)}<span class="n"></span></div>
+  </article>`;
+}
+
+function render(){
+  const c = cur();
+  drawProgress();
+  promptEl.hidden = false;
+  promptEl.textContent = `Caso ${S.i+1} de ${CASES.length}. Chegou no seu celular. Você confiaria?`;
+  stage.innerHTML = post(c) + `
+    <div class="vote" id="vote">
+      <button id="bSafe" type="button">Confiável</button>
+      <button id="bScam" type="button">Golpe</button>
+    </div>`;
+  fitArt();
+  document.getElementById('bSafe').onclick = ()=>answer(false);
+  document.getElementById('bScam').onclick = ()=>answer(true);
+}
+
+function answer(saidScam){
+  const c = cur();
+  const right = saidScam === c.golpe;
+  S.results.push(right);
+  if(right) S.pts += 100;
+  save(); salvarPlacar();
+  drawProgress();
+  document.getElementById('vote').remove();
+
+  // marca no post os elementos citados; um elemento pode ter mais de um sinal ("1·2")
+  const postEl = document.getElementById('post');
+  const items = c.golpe ? c.flags : c.ok;
+  postEl.classList.add('marked');
+  if(!c.golpe) postEl.classList.add('okd');
+  const nums = {};
+  items.forEach(([k],n)=>{ if(k) (nums[k] = nums[k] || []).push(n+1); });
+  Object.entries(nums).forEach(([k,ns])=>{
+    const el = postEl.querySelector(`.sig[data-k="${k}"]`);
+    if(el){ el.classList.add('on'); el.querySelector(':scope > .n').textContent = ns.join('·'); }
+  });
+  const list = items.map(([k,t],n)=> k
+    ? `<li><span class="n${c.golpe?'':' g'}">${n+1}</span><span>${esc(t)}</span></li>`
+    : `<li><span class="n tip">i</span><span>${esc(t)}</span></li>`).join('');
+
+  const last = S.i >= CASES.length-1;
+  const box = document.createElement('section');
+  box.className = 'reveal';
+  box.innerHTML = `
+    <div class="verdict">
+      <span class="stamp ${c.golpe?'scam':'safe'}">${c.golpe?'Golpe':'Confiável'}</span>
+      <b>${right?'Você acertou! +100':'Não foi dessa vez.'}</b>
+    </div>
+    <h4>${c.golpe?'Os sinais que denunciavam':'Por que é confiável'}</h4>
+    <ol>${list}</ol>
+    <p class="case"><b>${c.url?'Caso real:':'Sobre este caso:'}</b> ${esc(c.caso)} ${c.url?`<br>Fonte: <a href="${c.url}" target="_blank" rel="noopener">${esc(c.fonte)}</a>`:''}</p>
+    <button class="next" id="next" type="button">${last?'Ver meu resultado':'Próximo caso'}</button>`;
+  stage.appendChild(box);
+  document.getElementById('next').onclick = ()=>{
+    S.i++; save();
+    S.i < CASES.length ? render() : finish();
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function level(ok, n){
+  if(ok===n) return 'Olho de águia';
+  if(ok>=n-2) return 'Desconfiado na medida certa';
+  if(ok>=Math.ceil(n/2)) return 'Quase lá';
+  return 'Alvo fácil (por enquanto)';
+}
+
+function finish(){
+  S.i = CASES.length; save();
+  drawProgress();
+  const n = CASES.length;
+  const ok = S.results.filter(Boolean).length;
+  const missed = S.results.map((r,k)=>r?null:CASES[S.order[k]]).filter(Boolean);
+  promptEl.textContent = 'Fim de jogo.';
+  stage.innerHTML = `
+  <section class="end">
+    <div class="result">
+      ${S.name?`<span class="who-r">${esc(S.name)}</span>`:''}
+      <div class="big">${ok}/${n}</div>
+      <span class="level">${level(ok,n)}</span>
+      <span class="prompt">${S.pts} pontos</span>
+    </div>
+    ${S.treino?'<p class="prompt">Rodada de treino: este resultado não entra no placar da sala.</p>':''}
+    ${fdb?'<div class="room" id="room"><div class="wide"><small>Carregando os resultados da sala…</small></div></div>':''}
+    ${missed.length?`<div><h2 style="margin-bottom:8px">Onde você caiu</h2><ul class="missed">${missed.map(c=>`<li><span>${esc(c.page)}</span><span>era ${c.golpe?'golpe':'confiável'}</span></li>`).join('')}</ul></div>`:''}
+    <p class="soon">Olhe para o telão: vamos mostrar o pódio e o caso em que a sala mais caiu.</p>
+    <h2>Protocolo antigolpe</h2>
+    <ul class="check">
+      <li><b>Pare.</b> Golpe vive de pressa: “agora”, “só hoje”, “em 24h”.</li>
+      <li><b>Desconfie.</b> Pediu Pix, código, senha ou para instalar app? É alerta.</li>
+      <li><b>Confirme por outro canal.</b> Ligue no número que você já tem ou abra o app oficial.</li>
+      <li>Número novo dizendo ser da família? Faça chamada de vídeo ou use a palavra de segurança.</li>
+      <li>Preço ou prêmio bom demais e taxa antes de liberar? É golpe.</li>
+    </ul>
+    <p class="prompt">Anúncio pago não é selo de verificação, e voz ou rosto conhecido pode ser feito por IA.</p>
+    <button class="next ghost" id="again" type="button">Jogar de novo</button>
+  </section>`;
+  // resultado da sala ao vivo: posição, média e o anúncio em que mais gente caiu
+  if(stopSala) stopSala();
+  const meu = S.gid, treino = S.treino;
+  stopSala = ouvirSala(S.rodada, jogos=>{
+    const box = document.getElementById('room');
+    if(!box) return;
+    const r = resumoSala(jogos);
+    const pos = r.rank.findIndex(j=>j.id===meu) + 1;
+    const pior = r.porCaso[0];
+    box.innerHTML = `
+      ${!treino && pos ? `<div><small>Sua posição</small><b>${pos}º de ${r.rank.length}</b></div>` : `<div><small>Jogadores na sala</small><b>${r.rank.length}</b></div>`}
+      <div><small>Média da sala</small><b>${r.media===null?'–':r.media.toFixed(1).replace('.',',')+'/'+n}</b></div>
+      ${pior && pior.err ? `<div class="wide"><small>Onde a sala mais caiu</small><b class="sm">${esc(pior.c.page)} · ${pct(pior.pct)} erraram</b></div>` : ''}`;
+  });
+  document.getElementById('again').onclick = ()=>{ if(stopSala){ stopSala(); stopSala=null; } newGame(S.name, true); render(); window.scrollTo({top:0}); };
+}
+let stopSala = null;
+
+// tela para projetar antes da apresentação: QR code + placar ao vivo
+function telao(){
+  document.body.classList.add('tv');
+  const url = JOGO_URL || location.href.split('#')[0];
+  document.querySelector('.wrap').innerHTML = `
+  <div class="tv-grid">
+    <section class="tv-card">
+      <h1>Golpe ou <span>Confiável?</span></h1>
+      <p class="tv-sub">Aponte a câmera do celular para o QR Code e jogue.</p>
+      <div class="qr" id="qr"></div>
+      <p class="tv-url">${esc(url.replace(/^https?:\/\//,'').replace(/\/$/,''))}</p>
+      <p class="tv-sub">${CASES.length} casos · uns 6 minutos · tem golpe e tem caso de verdade</p>
+    </section>
+    ${fdb?`<section class="tv-live">
+      <p class="tv-count"><b id="nJog">0</b> jogando <span aria-hidden="true">·</span> <b id="nFim">0</b> terminaram <span aria-hidden="true">·</span> média <b id="media">–</b></p>
+      <div><h2>Ranking ao vivo</h2><ol class="rank" id="rank"></ol></div>
+      <div><h2>Onde a sala mais caiu</h2><p class="tv-note">Porcentagem de quem errou cada caso</p><ul class="bars" id="bars"></ul></div>
+      <div class="tv-actions"><button class="next" id="verPodio" type="button">Mostrar pódio</button><button class="reset" id="reset" type="button">Zerar placar</button></div>
+    </section>`:''}
+  </div>
+  ${fdb?`<section class="podio" id="podio" aria-live="polite">
+    <h2>Pódio da turma</h2>
+    <div class="pods">
+      <div class="pod p2"><span class="nm" id="n2">–</span><span class="pt" id="t2"></span><div class="blk">2º</div></div>
+      <div class="pod p1"><span class="nm" id="n1">–</span><span class="pt" id="t1"></span><div class="blk">1º</div></div>
+      <div class="pod p3"><span class="nm" id="n3">–</span><span class="pt" id="t3"></span><div class="blk">3º</div></div>
+    </div>
+    <p class="pior" id="pior"></p>
+    <button class="next ghost" id="fecharPodio" type="button">Voltar ao ranking</button>
+  </section>`:''}`;
+  const box = document.getElementById('qr');
+  if(window.QRCode){
+    new QRCode(box, {text:url, width:720, height:720, colorDark:'#0B0B0B', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
+  } else box.hidden = true;
+  if(!fdb) return;
+
+  const desenhar = jogos=>{
+    const r = resumoSala(jogos);
+    document.getElementById('nJog').textContent = r.rank.length - r.nFim;
+    document.getElementById('nFim').textContent = r.nFim;
+    document.getElementById('media').textContent = r.media===null ? '–' : r.media.toFixed(1).replace('.',',') + '/' + CASES.length;
+    document.getElementById('rank').innerHTML = r.rank.length
+      ? r.rank.slice(0,8).map(j=>`<li><span class="nm">${esc(j.nome || 'Anônimo')}</span><span class="st">${esc(j.fim ? j.acertos+'/'+j.total : 'jogando · '+j.respondidas+'/'+j.total)}</span><span class="pt">${esc(j.pts)}</span></li>`).join('')
+      : '<li class="empty">Ninguém jogou ainda. Escaneie o QR code e seja o primeiro.</li>';
+    document.getElementById('bars').innerHTML = r.porCaso.length
+      ? r.porCaso.map(x=>`<li title="${x.err} de ${x.n} erraram">
+          <span class="lb">${esc(x.c.page)} <small>era ${x.c.golpe?'golpe':'confiável'}</small></span>
+          <span class="vl">${pct(x.pct)}</span>
+          <span class="tr"><span class="fl" style="width:${Math.max(x.pct*100,0.5)}%"></span></span></li>`).join('')
+      : '<li class="empty">As respostas aparecem aqui assim que a primeira pessoa votar.</li>';
+  };
+  // pódio: os 3 primeiros e o caso em que a sala mais caiu
+  let ultimo = [];
+  const podio = document.getElementById('podio');
+  const desenharPodio = ()=>{
+    const r = resumoSala(ultimo);
+    [0,1,2].forEach(k=>{
+      const j = r.rank[k];
+      document.getElementById('n'+(k+1)).textContent = j ? (j.nome || 'Anônimo') : '–';
+      document.getElementById('t'+(k+1)).textContent = j ? j.pts + ' pts · ' + j.acertos + '/' + j.total : '';
+    });
+    const pior = r.porCaso[0];
+    document.getElementById('pior').innerHTML = pior && pior.err ? `Onde a sala mais caiu: <b>${esc(pior.c.page)}</b> · ${pct(pior.pct)} erraram (era ${pior.c.golpe?'golpe':'confiável'})` : '';
+  };
+  const desenharTudo = jogos=>{ ultimo = jogos; desenhar(jogos); if(podio.classList.contains('on')) desenharPodio(); };
+  document.getElementById('verPodio').onclick = ()=>{ desenharPodio(); podio.classList.remove('on'); void podio.offsetWidth; podio.classList.add('on'); };
+  document.getElementById('fecharPodio').onclick = ()=>podio.classList.remove('on');
+  addEventListener('keydown', e=>{ if(e.key==='Escape') podio.classList.remove('on'); });
+  let stop = ouvirSala(rodadaAtual, desenharTudo);
+  aoMudarRodada.push(rod=>{ stop(); stop = ouvirSala(rod, desenharTudo); });
+
+  // zerar: começa uma rodada nova (os jogos antigos continuam no banco, só saem do telão)
+  const reset = document.getElementById('reset');
+  let armado = null;
+  reset.onclick = ()=>{
+    if(!armado){
+      reset.textContent = 'Clique de novo para zerar';
+      reset.classList.add('armed');
+      armado = setTimeout(()=>{ armado=null; reset.textContent='Zerar placar'; reset.classList.remove('armed'); }, 4000);
+      return;
+    }
+    clearTimeout(armado); armado = null;
+    reset.textContent = 'Zerar placar'; reset.classList.remove('armed');
+    fdb.doc('config/atual').set({rodada:'r'+Date.now()}).catch(()=>{ reset.textContent = 'Não foi possível zerar. Confira a internet.'; });
+  };
+}
+
+// ---------- início ----------
+if(location.hash === '#telao'){
+  telao();
+} else {
+  S = load();
+  if(!S) intro();
+  else if(S.results.length >= CASES.length) finish();
+  else { S.i = S.results.length; render(); }
+}
+</script>
