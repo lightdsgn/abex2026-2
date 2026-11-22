@@ -226,15 +226,157 @@ body.tv .bars .lb,body.tv .bars .vl{font-size:1.2rem}
 .podio .pior b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.podio.on .blk,.podio.on .pod .nm,.podio.on .pod .pt{animation:none}}
 
+
+/* ================= v2: layout responsivo, posts e mensagens ================= */
+body:not(.tv) .wrap{max-width:1120px;gap:14px;padding-top:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px 9px 12px;border-radius:20px;background:linear-gradient(140deg,rgba(255,255,255,.11),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);position:sticky;top:10px;z-index:30;box-shadow:0 20px 50px -25px rgba(0,0,0,.8)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:34px;height:34px;border-radius:11px;background:var(--g);display:grid;place-items:center;font-weight:700;font-size:1.05rem;color:#fff;flex:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.top h1{font-size:1.2rem;white-space:nowrap}
+.top .score{font-size:.95rem;padding:6px 12px}
+.statusline{display:flex;align-items:center;gap:12px}
+.statusline .progress{flex:1}
+.statusline .prompt{font-size:.82rem;white-space:nowrap;font-weight:600;color:var(--muted)}
+.foot{max-width:640px;margin:8px auto 0}
+
+/* jogo: caso + painel */
+.play{display:grid;gap:16px;align-items:start}
+.dev{min-width:0;width:100%;max-width:440px;margin:0 auto}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ask{border-radius:24px;padding:18px 18px 16px;background:linear-gradient(140deg,rgba(255,255,255,.12),rgba(255,255,255,.035) 60%,rgba(255,255,255,.07));-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.ask .q{margin:0;font-size:.82rem;font-weight:600;color:#FF9A5C}
+.ask h2{margin:4px 0 0;font-family:var(--display);font-size:1.55rem;letter-spacing:-.04em;line-height:1.05}
+.ask p{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+.tips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0;padding:0;list-style:none}
+.tips li{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--muted)}
+.vote{background:none;padding:0}
+.vote button{display:flex;align-items:center;justify-content:center;gap:8px}
+@media (max-width:899px){
+  .vote{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,rgba(6,6,6,0),rgba(6,6,6,.92) 30%,#060606)}
+  body.playing .wrap{padding-bottom:100px}
+  .ask{padding:14px 16px}
+  .ask h2{font-size:1.3rem}
+  .ask .tips{display:none}
+}
+@media (min-width:900px){
+  .play{grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:36px}
+  .dev{margin:0}
+  .side{position:sticky;top:86px}
+  .vote{position:static}
+  .reveal{margin-top:0}
+}
+
+/* post estilo rede social */
+.post{border-radius:24px;box-shadow:0 34px 80px -34px rgba(0,0,0,.9);border:0}
+.p-head{padding:12px 14px}
+.avatar{width:38px;height:38px;box-shadow:0 0 0 2px #fff,0 0 0 4px #F16001}
+.who b{font-size:.93rem}
+.who small{display:flex;align-items:center;gap:4px}
+.media.has-real{background:#000!important}
+.linkcard{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#f2f3f7;border-bottom:1px solid var(--post-line)}
+.linkcard .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.linkcard .dom{font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--post-muted);align-self:flex-start;max-width:100%}
+.linkcard .dom-t{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkcard h3{margin:0;font-family:var(--body);font-size:.98rem;font-weight:700;line-height:1.2;color:var(--post-ink);text-wrap:balance}
+.linkcard .sig[data-k="title"]{align-self:flex-start}
+.linkcard p{margin:0;font-size:.8rem;color:var(--post-muted);line-height:1.3}
+.linkcard .btn{flex:none;background:#e3e5ea;color:#14161f;font-weight:700;font-size:.84rem;padding:9px 13px;border-radius:9px;white-space:nowrap}
+.acts{display:flex;align-items:center;gap:15px;padding:10px 14px 2px;color:var(--post-ink)}
+.acts svg{width:24px;height:24px;display:block}
+.acts .sp{flex:1}
+.likes{padding:6px 14px 0;font-size:.84rem;font-weight:700;color:var(--post-ink)}
+.caption{padding:4px 14px 2px;font-size:.88rem;line-height:1.38}
+.comments{padding:4px 14px 2px;font-size:.82rem}
+.ptime{padding:4px 14px 14px;font-size:.68rem;color:var(--post-muted);text-transform:uppercase;letter-spacing:.04em}
+.marked .media.sig.on > .n,.marked .media.has-real.sig.on > .n{top:12px;right:12px;left:auto}
+
+/* apps de mensagem desenhados em HTML */
+.msgapp{border-radius:30px;overflow:hidden;display:flex;flex-direction:column;min-height:600px;box-shadow:0 34px 80px -34px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.14);position:relative}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-size:.78rem;font-weight:700}
+.sbar .si{display:flex;gap:6px;align-items:center}
+.sbar .si i{display:block;width:16px;height:9px;border-radius:2px;border:1.5px solid currentColor}
+.msgapp.chat{background:#0b141a;color:#e9edef}
+.wa-head{display:flex;align-items:center;gap:8px;padding:8px 12px 10px;background:#1f2c34}
+.wa-head .bk{font-size:1.6rem;line-height:1;color:#aebac1;margin-right:-2px}
+.wa-av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;overflow:visible}
+.wa-av svg{width:40px;height:40px;border-radius:50%;display:block}
+.wa-who{flex:1;min-width:0;padding:2px 4px}
+.wa-who b{display:block;font-size:.98rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wa-who small{display:block;font-size:.74rem;color:#8696a0}
+.wa-ic{display:flex;gap:18px;color:#aebac1}
+.wa-ic svg{width:21px;height:21px}
+.wa-body{flex:1;padding:12px 12px 18px;display:flex;flex-direction:column;gap:5px;background-color:#0b141a;background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:18px 18px}
+.wa-banner{align-self:center;max-width:94%;text-align:center;background:#182229;color:#e9c46a;font-size:.76rem;line-height:1.35;padding:8px 12px;border-radius:10px;margin-bottom:6px}
+.wa-day{align-self:center;background:#182229;color:#8696a0;font-size:.7rem;padding:4px 10px;border-radius:8px;margin:2px 0 8px}
+.bub{align-self:flex-start;max-width:86%;background:#202c33;padding:7px 10px 19px;border-radius:12px;font-size:.92rem;line-height:1.38;position:relative;min-width:90px}
+.bub.first{border-top-left-radius:0}
+.bub time{position:absolute;right:9px;bottom:4px;font-size:.64rem;color:#8696a0}
+.bub b{font-weight:700}
+.aud{display:flex;align-items:center;gap:10px;width:260px;max-width:100%;padding-right:4px}
+.aud .pl{width:36px;height:36px;border-radius:50%;background:#00a884;display:grid;place-items:center;flex:none}
+.aud .wv{display:flex;align-items:center;gap:2px;flex:1;height:30px}
+.aud .wv i{display:block;width:3px;border-radius:2px;background:#8696a0}
+.aud .du{font-size:.72rem;color:#8696a0}
+.bub.tr{font-size:.8rem;color:#c7d0d4;background:#1a252c;border:1px dashed rgba(255,255,255,.18)}
+.bub.tr em{display:block;font-style:normal;font-size:.68rem;color:#8696a0;margin-bottom:2px}
+.wa-in{display:flex;align-items:center;gap:8px;padding:8px 10px 14px;background:#0b141a}
+.wa-in span{flex:1;background:#1f2c34;border-radius:22px;padding:11px 15px;color:#8696a0;font-size:.9rem}
+.wa-in i{width:42px;height:42px;border-radius:50%;background:#00a884;flex:none}
+.msgapp.sms{background:#fff;color:#111}
+.msgapp.sms .sbar{color:#111}
+.sms-head{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px 10px;border-bottom:1px solid #e5e5ea;background:#f7f7f9}
+.sms-av{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:1rem}
+.sms-head b{font-size:.86rem}
+.sms-head small{font-size:.7rem;color:#8e8e93}
+.sms-body{flex:1;padding:14px 14px 18px;display:flex;flex-direction:column;gap:4px}
+.sms-day{align-self:center;font-size:.7rem;color:#8e8e93;margin-bottom:10px;text-align:center}
+.sb{align-self:flex-start;max-width:84%;background:#e9e9eb;color:#111;padding:9px 13px;border-radius:18px;font-size:.94rem;line-height:1.36}
+.sb.last{border-bottom-left-radius:5px}
+.sb.lk{color:#0a64d6;text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.sms-note{align-self:center;font-size:.74rem;color:#8e8e93;margin-top:14px;text-align:center;max-width:90%}
+.sms-in{display:flex;gap:8px;align-items:center;padding:8px 12px 14px;border-top:1px solid #e5e5ea}
+.sms-in span{flex:1;border:1px solid #d1d1d6;border-radius:20px;padding:9px 14px;color:#8e8e93;font-size:.88rem}
+.msgapp .watermark{z-index:3}
+.msgapp .watermark span{color:rgba(127,127,127,.22);border-color:rgba(127,127,127,.22)}
+.marked .msgapp .sig.on > .n,.marked .sig.on > .n{right:-6px}
+
+/* cabeçalho: gradiente claro para aparecer sobre o brilho */
+.top h1 span{background:linear-gradient(90deg,#FF7A2F,#FFB37A 60%,#FFE1C7);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* tela inicial em duas colunas */
+.intro-l{display:flex;flex-direction:column;gap:14px;min-width:0}
+.intro-art{display:none}
+@media (min-width:900px){
+  .intro{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:36px;padding:34px;align-items:center}
+  .intro h2{font-size:2.6rem}
+  .intro-art{display:flex;flex-direction:column;gap:12px}
+}
+.mini{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:20px;background:rgba(0,0,0,.35);border:1px solid var(--line)}
+.mini .ic{width:42px;height:42px;border-radius:12px;flex:none;display:grid;place-items:center;font-weight:700;color:#fff;font-size:.85rem}
+.mini b{display:block;font-size:.88rem}
+.mini p{margin:2px 0 0;font-size:.82rem;color:var(--muted);line-height:1.35}
+.mini .tag{margin-left:auto;align-self:center;font-size:.72rem;font-weight:700;padding:5px 9px;border-radius:999px;white-space:nowrap}
+.mini .tag.g{background:var(--g);color:#fff}
+.mini .tag.c{background:var(--safe-soft);color:var(--safe);border:1px solid var(--safe)}
+.mini:nth-child(2){margin-left:28px}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;list-style:none}
+.steps3 li{border:1px solid var(--line);border-radius:14px;padding:10px;font-size:.8rem;color:var(--muted);line-height:1.3}
+.steps3 b{display:block;color:var(--ink);font-size:.9rem;margin-bottom:2px}
+
+/* fim em duas colunas */
+@media (min-width:900px){
+  .end{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 30px;padding:28px;align-items:start}
+  .end .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+}
+.end .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:600px){.steps3{grid-template-columns:1fr}.steps3 li{display:flex;gap:6px;align-items:baseline}.steps3 b{display:inline;margin:0;white-space:nowrap}}
 </style>
 
 <div class="wrap">
-  <header>
-    <h1>Golpe ou <span>Confiável?</span></h1>
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true">?</span><h1>Golpe ou <span>Confiável?</span></h1></div>
     <div class="score" id="score" aria-live="polite">0 pts</div>
   </header>
-  <div class="progress" id="progress"></div>
-  <p class="prompt" id="prompt"></p>
+  <div class="statusline"><div class="progress" id="progress"></div><p class="prompt" id="prompt"></p></div>
   <main id="stage"></main>
   <p class="foot">Casos reconstituídos a partir de golpes reais noticiados. Links, QR codes, chaves Pix e telefones foram removidos. ABEX I · Unochapecó.</p>
 </div>
@@ -742,20 +884,31 @@ function mediaEl(src){
 // ---------- telas ----------
 function intro(){
   drawProgress();
+  document.body.classList.remove('playing');
   promptEl.hidden = true;
   stage.innerHTML = `
   <section class="intro">
-    <p class="eyebrow">Mini jogo · uns 6 minutos</p>
-    <h2>Você cairia nesses golpes?</h2>
-    <p>São ${CASES.length} casos montados a partir de golpes reais: anúncios, mensagens de WhatsApp e SMS. Alguns são golpe, outros são de verdade. Em cada um, decida:</p>
-    <div class="duo"><span class="c">Confiável</span><span class="g">Golpe</span></div>
-    <p>Depois de cada resposta, mostramos os sinais que entregam o golpe. Cada acerto vale 100 pontos.</p>
-    <div class="field">
-      <label for="nick">Seu apelido</label>
-      <input id="nick" maxlength="24" autocomplete="off" placeholder="Ex.: Ana da 3ª fileira">
-      <small>Aparece no placar projetado para a turma. Use um apelido, não o nome completo.</small>
+    <div class="intro-l">
+      <p class="eyebrow">Mini jogo · uns 6 minutos · ${CASES.length} casos</p>
+      <h2>Você cairia nesses golpes?</h2>
+      <p>Anúncios, mensagens de WhatsApp e SMS montados a partir de golpes reais. Alguns são golpe, outros são de verdade.</p>
+      <ol class="steps3">
+        <li><b>1. Analise</b>remetente, link e o que estão pedindo</li>
+        <li><b>2. Decida</b>golpe ou confiável?</li>
+        <li><b>3. Aprenda</b>veja onde estavam os sinais</li>
+      </ol>
+      <div class="field">
+        <label for="nick">Seu apelido</label>
+        <input id="nick" maxlength="24" autocomplete="off" placeholder="Ex.: Ana da 3ª fileira">
+        <small>Aparece no placar do telão. Use um apelido, não o nome completo. Cada acerto vale 100 pontos.</small>
+      </div>
+      <button class="next" id="go" type="button">Começar</button>
     </div>
-    <button class="next" id="go" type="button">Começar</button>
+    <div class="intro-art" aria-hidden="true">
+      <div class="mini"><span class="ic" style="background:#25603f">WA</span><div><b>+55 49 9 8xxx-0217</b><p>Oi mãe, troquei de número. Me faz um Pix?</p></div><span class="tag g">Golpe</span></div>
+      <div class="mini"><span class="ic" style="background:#1351b4">gov</span><div><b>Governo Federal</b><p>Prova de vida do INSS é automática.</p></div><span class="tag c">Confiável</span></div>
+      <div class="mini"><span class="ic" style="background:#3a3a3c">SMS</span><div><b>INSS-AVISO</b><p>Seu benefício será BLOQUEADO em 24h…</p></div><span class="tag g">Golpe</span></div>
+    </div>
   </section>`;
   const nick = document.getElementById('nick');
   const go = ()=>{ newGame(nick.value.trim().slice(0,24)); promptEl.hidden=false; render(); window.scrollTo({top:0}); };
@@ -763,11 +916,27 @@ function intro(){
   nick.addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
 }
 
+const ICON = {
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-9.2-8.6C1.3 8.4 3 5 6.4 5c2 0 3.3 1.1 4 2.3h3.2C14.3 6.1 15.6 5 17.6 5 21 5 22.7 8.4 21.2 11.4 19 15.6 12 20 12 20z"/></svg>',
+  comment:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',
+  save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+  play:'<svg width="14" height="16" viewBox="0 0 14 16"><path d="M1 1l12 7-12 7z" fill="#fff"/></svg>'
+};
+const PESSOA = (bg,skin)=>`<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="${bg}"/><circle cx="20" cy="16" r="7.5" fill="${skin}"/><path d="M6 38c1.5-7.5 7-11 14-11s12.5 3.5 14 11z" fill="${skin}"/></svg>`;
+const sig = (k, inner, cls='', tag='div') => k
+  ? `<${tag} class="${cls} sig" data-k="${k}">${inner}<span class="n"></span></${tag}>`
+  : `<${tag} class="${cls}">${inner}</${tag}>`;
+const fmtNum = n => n.toLocaleString('pt-BR');
+
 function post(c){
   const art = c.art || '';
   const src = art ? '' : (c.src || '');
   const real = !!c.real;
   const has = art || src;
+  const likes = c.likes || (c.golpe ? 87 + (c.id.length*131)%900 : 1200 + (c.id.length*977)%9000);
   return `
   <article class="post" id="post">
     <div class="p-head">
@@ -780,29 +949,128 @@ function post(c){
         ${real?'':'<div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>'}</div>`:`
       <div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>`}
       <span class="kind">${esc(real?'Anúncio real':c.kind)}</span>
-      <div class="sig" data-k="title"><h3>${esc(c.title)}</h3><span class="n"></span></div>
-      <p>${esc(c.sub2)}</p>
       <span class="n"></span>
     </div>
-    <div class="cta-bar">
-      <span class="dom sig" data-k="dom"><span class="dom-t">${esc(c.dom)}</span><span class="n"></span></span>
+    <div class="linkcard">
+      <div class="txt">
+        <span class="dom sig" data-k="dom"><span class="dom-t">${esc(c.dom)}</span><span class="n"></span></span>
+        <div class="sig" data-k="title"><h3>${esc(c.title)}</h3><span class="n"></span></div>
+        <p>${esc(c.sub2)}</p>
+      </div>
       <span class="btn sig" data-k="cta">${esc(c.cta)}<span class="n"></span></span>
     </div>
+    <div class="acts">${ICON.heart}${ICON.comment}${ICON.send}<span class="sp"></span>${ICON.save}</div>
+    <div class="likes">${fmtNum(likes)} curtidas</div>
     <div class="caption sig" data-k="caption"><b>${esc(c.page)}</b> ${esc(c.caption)}<span class="n"></span></div>
     <div class="comments sig" data-k="comments">${esc(c.comments)}<span class="n"></span></div>
+    <div class="ptime">${esc(c.when || 'há 2 horas')}</div>
   </article>`;
 }
+
+function sbar(){ return `<div class="sbar"><span>21:47</span><span class="si">5G <i></i></span></div>`; }
+
+function chat(c){
+  const m = c.msg;
+  const body = m.items.map((it,ix)=>{
+    const first = ix===0 ? ' first' : '';
+    if(it.t==='audio'){
+      const bars = [8,14,20,12,24,16,10,22,28,16,12,18,26,14,8,18,24,16,10,20,14,10,18,12,8,16].map(h=>`<i style="height:${h}px"></i>`).join('');
+      return sig(it.k, `<div class="aud"><span class="pl">${ICON.play}</span><span class="wv">${bars}</span><span class="du">${it.dur}</span></div><time>${it.time}</time>`, 'bub'+first);
+    }
+    if(it.t==='tr') return sig(it.k, `<em>Transcrição do áudio</em>${esc(it.h)}<time>${it.time}</time>`, 'bub tr');
+    return sig(it.k, `${it.h}<time>${it.time}</time>`, 'bub'+first);
+  }).join('');
+  return `
+  <article class="msgapp chat" id="post">
+    ${sbar()}
+    <div class="wa-head">
+      <span class="bk" aria-hidden="true">‹</span>
+      ${sig(m.avk, PESSOA(c.av, m.skin||'#cfd8dc'), 'wa-av', 'span')}
+      ${sig('page', `<b>${esc(c.page)}</b><small>${esc(m.status)}</small>`, 'wa-who')}
+      <span class="wa-ic">${ICON.video}${ICON.phone}</span>
+    </div>
+    <div class="wa-body">
+      ${m.banner ? sig(m.banner.k, esc(m.banner.t), 'wa-banner') : ''}
+      <div class="wa-day">Hoje</div>
+      ${body}
+    </div>
+    <div class="wa-in"><span>Mensagem</span><i></i></div>
+    <div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>
+  </article>`;
+}
+
+function sms(c){
+  const m = c.msg;
+  const n = m.items.length;
+  const body = m.items.map((it,ix)=> sig(it.k, it.h, 'sb'+(it.link?' lk':'')+(ix===n-1?' last':''))).join('');
+  return `
+  <article class="msgapp sms" id="post">
+    ${sbar()}
+    <div class="sms-head">
+      ${sig(m.avk, esc(c.ini), 'sms-av', 'span').replace('class="sms-av', `style="background:${c.av}" class="sms-av`)}
+      <b>${esc(c.page)}</b><small>${esc(m.status)}</small>
+    </div>
+    <div class="sms-body">
+      <div class="sms-day">Mensagem de texto<br>${esc(m.when)}</div>
+      ${body}
+      ${m.note ? sig(m.note.k, esc(m.note.t), 'sms-note') : ''}
+    </div>
+    <div class="sms-in"><span>Mensagem de texto</span></div>
+    <div class="watermark" aria-hidden="true"><span>RECONSTITUIÇÃO</span></div>
+  </article>`;
+}
+
+// mensagens desenhadas como no app de verdade (WhatsApp e SMS)
+const MSG = {
+  parente:{fmt:'chat', status:'online', avk:'comments', skin:'#e8c4a8',
+    banner:{k:null, t:'Este número não está salvo nos seus contatos. Adicionar · Bloquear'},
+    items:[{h:'Oi mãe, tudo bem?', time:'21:40'},{h:'Troquei de número, salva esse aqui', time:'21:40'},
+      {h:'Meu app do banco travou e preciso pagar um boleto hoje', time:'21:41'},
+      {k:'caption', h:'Consegue me fazer um Pix de <b>R$ 1.850</b> agora? Amanhã te devolvo, é urgente', time:'21:41'}]},
+  voz:{fmt:'chat', status:'gravando áudio…', avk:null, skin:'#f1d3bd',
+    banner:{k:'dom', t:'Este número não está salvo nos seus contatos. Adicionar · Bloquear'},
+    items:[{t:'audio', k:'media', dur:'0:24', time:'21:44'},
+      {t:'tr', k:'caption', h:'“Vó, sou eu! Bati o carro, tô na delegacia e preciso de R$ 2.000 agora pro advogado. Não conta pro pai, por favor.”', time:'21:44'},
+      {h:'Vó, me responde rápido', time:'21:45'},
+      {k:'comments', h:'Não liga, tô sem bateria. Manda o Pix que eu te explico', time:'21:45'}]},
+  inss:{fmt:'sms', status:'Remetente: INSS-AVISO', avk:null, when:'Hoje 09:12',
+    items:[{k:'title', h:'INSS: Seu beneficio sera <b>BLOQUEADO em 24h</b>'},
+      {k:'caption', h:'por falta de atualizacao cadastral. Regularize agora pelo link:'},
+      {k:'dom', link:true, h:'inss-atualiza-cadastro.com/regularizar'}]},
+  central:{fmt:'sms', status:'Remetente: BANCO-SEGURO', avk:null, when:'Hoje 23:14',
+    items:[{k:'title', h:'Compra aprovada <b>R$ 1.890,00</b> em LOJA ONLINE 22/11 23:14.'},
+      {k:'caption', h:'Nao reconhece? Ligue AGORA para a Central de Seguranca:'},
+      {k:'dom', link:true, h:'0800 [número removido]'}],
+    note:{k:'comments', t:'Você não fez nenhuma compra hoje.'}}
+};
+Object.entries(MSG).forEach(([id,m])=>{ const c = CASES.find(x=>x.id===id); if(c) c.msg = m; });
+
+function caso(c){ return c.msg ? (c.msg.fmt==='sms' ? sms(c) : chat(c)) : post(c); }
+const DICAS = { post:['Quem está anunciando?','O link é oficial?','O preço faz sentido?','Tem pressa?'], chat:['Você conhece esse número?','Estão pedindo dinheiro?','Tem pressa ou segredo?'], sms:['Quem enviou?','O link termina em .gov.br?','Pede para ligar ou clicar?'] };
 
 function render(){
   const c = cur();
   drawProgress();
+  document.body.classList.add('playing');
   promptEl.hidden = false;
-  promptEl.textContent = `Caso ${S.i+1} de ${CASES.length}. Chegou no seu celular. Você confiaria?`;
-  stage.innerHTML = post(c) + `
-    <div class="vote" id="vote">
-      <button id="bSafe" type="button">Confiável</button>
-      <button id="bScam" type="button">Golpe</button>
-    </div>`;
+  promptEl.textContent = `Caso ${S.i+1} de ${CASES.length}`;
+  const tipo = c.msg ? c.msg.fmt : 'post';
+  const onde = tipo==='chat' ? 'Chegou no seu WhatsApp.' : tipo==='sms' ? 'Chegou por SMS.' : 'Apareceu no seu feed.';
+  stage.innerHTML = `
+  <div class="play">
+    <div class="dev">${caso(c)}</div>
+    <aside class="side" id="side">
+      <section class="ask">
+        <p class="q">Caso ${S.i+1} de ${CASES.length} · ${c.msg ? (tipo==='chat'?'WhatsApp':'SMS') : 'Anúncio'}</p>
+        <h2>${onde} Você confiaria?</h2>
+        <ul class="tips">${DICAS[tipo].map(d=>`<li>${d}</li>`).join('')}</ul>
+      </section>
+      <div class="vote" id="vote">
+        <button id="bSafe" type="button">Confiável</button>
+        <button id="bScam" type="button">Golpe</button>
+      </div>
+    </aside>
+  </div>`;
   fitArt();
   document.getElementById('bSafe').onclick = ()=>answer(false);
   document.getElementById('bScam').onclick = ()=>answer(true);
@@ -844,13 +1112,14 @@ function answer(saidScam){
     <ol>${list}</ol>
     <p class="case"><b>${c.url?'Caso real:':'Sobre este caso:'}</b> ${esc(c.caso)} ${c.url?`<br>Fonte: <a href="${c.url}" target="_blank" rel="noopener">${esc(c.fonte)}</a>`:''}</p>
     <button class="next" id="next" type="button">${last?'Ver meu resultado':'Próximo caso'}</button>`;
-  stage.appendChild(box);
+  document.getElementById('side').appendChild(box);
+  document.body.classList.remove('playing');
   document.getElementById('next').onclick = ()=>{
     S.i++; save();
     S.i < CASES.length ? render() : finish();
     window.scrollTo({top:0,behavior:'smooth'});
   };
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(innerWidth < 900) box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function level(ok, n){
@@ -867,8 +1136,10 @@ function finish(){
   const ok = S.results.filter(Boolean).length;
   const missed = S.results.map((r,k)=>r?null:CASES[S.order[k]]).filter(Boolean);
   promptEl.textContent = 'Fim de jogo.';
+  document.body.classList.remove('playing');
   stage.innerHTML = `
   <section class="end">
+   <div class="col">
     <div class="result">
       ${S.name?`<span class="who-r">${esc(S.name)}</span>`:''}
       <div class="big">${ok}/${n}</div>
@@ -878,17 +1149,21 @@ function finish(){
     ${S.treino?'<p class="prompt">Rodada de treino: este resultado não entra no placar da sala.</p>':''}
     ${fdb?'<div class="room" id="room"><div class="wide"><small>Carregando os resultados da sala…</small></div></div>':''}
     ${missed.length?`<div><h2 style="margin-bottom:8px">Onde você caiu</h2><ul class="missed">${missed.map(c=>`<li><span>${esc(c.page)}</span><span>era ${c.golpe?'golpe':'confiável'}</span></li>`).join('')}</ul></div>`:''}
+    <button class="next ghost" id="again2" type="button">Jogar de novo</button>
+   </div>
+   <div class="col">
     <p class="soon">Olhe para o telão: vamos mostrar o pódio e o caso em que a sala mais caiu.</p>
     <h2>Protocolo antigolpe</h2>
     <ul class="check">
-      <li><b>Pare.</b> Golpe vive de pressa: “agora”, “só hoje”, “em 24h”.</li>
-      <li><b>Desconfie.</b> Pediu Pix, código, senha ou para instalar app? É alerta.</li>
-      <li><b>Confirme por outro canal.</b> Ligue no número que você já tem ou abra o app oficial.</li>
-      <li>Número novo dizendo ser da família? Faça chamada de vídeo ou use a palavra de segurança.</li>
-      <li>Preço ou prêmio bom demais e taxa antes de liberar? É golpe.</li>
+      <li><span><b>Pare.</b> Golpe vive de pressa: “agora”, “só hoje”, “em 24h”.</span></li>
+      <li><span><b>Desconfie.</b> Pediu Pix, código, senha ou para instalar app? É alerta.</span></li>
+      <li><span><b>Confirme por outro canal.</b> Ligue no número que você já tem ou abra o app oficial.</span></li>
+      <li><span>Número novo dizendo ser da família? Faça chamada de vídeo ou use a palavra de segurança.</span></li>
+      <li><span>Preço ou prêmio bom demais e taxa antes de liberar? É golpe.</span></li>
     </ul>
     <p class="prompt">Anúncio pago não é selo de verificação, e voz ou rosto conhecido pode ser feito por IA.</p>
-    <button class="next ghost" id="again" type="button">Jogar de novo</button>
+    <button class="next ghost" id="again" type="button" hidden>Jogar de novo</button>
+   </div>
   </section>`;
   // resultado da sala ao vivo: posição, média e o anúncio em que mais gente caiu
   if(stopSala) stopSala();
@@ -904,6 +1179,7 @@ function finish(){
       <div><small>Média da sala</small><b>${r.media===null?'–':r.media.toFixed(1).replace('.',',')+'/'+n}</b></div>
       ${pior && pior.err ? `<div class="wide"><small>Onde a sala mais caiu</small><b class="sm">${esc(pior.c.page)} · ${pct(pior.pct)} erraram</b></div>` : ''}`;
   });
+  document.getElementById('again2').onclick = ()=>document.getElementById('again').click();
   document.getElementById('again').onclick = ()=>{ if(stopSala){ stopSala(); stopSala=null; } newGame(S.name, true); render(); window.scrollTo({top:0}); };
 }
 let stopSala = null;
